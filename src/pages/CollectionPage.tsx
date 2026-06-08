@@ -109,7 +109,8 @@ function CollectionPage() {
         setCollection(null);
         setCollectionProducts([]);
         toast.error('Unable to load collection products from Supabase.');
-      } finally {
+      } 
+      finally {
         if (isMounted) {
           setIsLoading(false);
         }
