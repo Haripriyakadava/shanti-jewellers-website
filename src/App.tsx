@@ -16,7 +16,7 @@ import {
   ShoppingBag,
   ArrowRight,
   Calendar,
-  ChevronDown
+  ChevronDown,
 } from "lucide-react";
 import { SeoHead } from "./components/SeoHead"; // <-- IMPORT ADDED HERE
 
@@ -172,7 +172,7 @@ function App() {
   const seoSectionRef = useRef<HTMLDivElement>(null);
   const mapSectionRef = useRef<HTMLDivElement>(null);
 
- const openWhatsAppInquiry = async (message: string) => {
+  const openWhatsAppInquiry = async (message: string) => {
     if (isOpeningWhatsApp) {
       return;
     }
@@ -182,10 +182,10 @@ function App() {
     try {
       // 1. Hardcoded target WhatsApp number (91 + your 10 digit number)
       const targetNumber = "919039039056";
-      
+
       // 2. Encode the message so it formats correctly in the URL
       const encodedMessage = encodeURIComponent(message);
-      
+
       // 3. Create the official wa.me link
       const href = `https://wa.me/${targetNumber}?text=${encodedMessage}`;
 
@@ -558,10 +558,10 @@ function App() {
   const shouldScrollCategories = isMobile || landingCategories.length > 4;
 
   return (
-    <div className="min-h-screen bg-charcoal text-white">
+    <div className="min-h-screen bg-charcoal text-white overflow-x-hidden w-full relative">
+      {" "}
       {/* Dynamic SEO Meta & JSON-LD injection */}
       <SeoHead />
-
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-charcoal/90 backdrop-blur-md border-b border-white/5">
         {hasGoldPriceTicker && (
@@ -707,7 +707,9 @@ function App() {
                   <div className="flex flex-col gap-6 mt-8">
                     <button
                       type="button"
-                      onClick={() => handleSectionNavigation("collections", true)}
+                      onClick={() =>
+                        handleSectionNavigation("collections", true)
+                      }
                       className="text-lg hover:text-gold transition-colors text-left"
                     >
                       Collections
@@ -721,7 +723,9 @@ function App() {
                     </button>
                     <button
                       type="button"
-                      onClick={() => handleSectionNavigation("categories", true)}
+                      onClick={() =>
+                        handleSectionNavigation("categories", true)
+                      }
                       className="text-lg hover:text-gold transition-colors text-left"
                     >
                       Categories
@@ -783,7 +787,6 @@ function App() {
           </div>
         </div>
       </nav>
-
       {/* Hero Section */}
       <header
         ref={heroRef}
@@ -814,13 +817,20 @@ function App() {
           <div className="max-w-2xl px-4 sm:px-0">
             {/* SEO Optimized H1 Header combining Brand and Location */}
             <h1 className="hero-title font-serif text-5xl sm:text-6xl md:text-7xl lg:text-[5.5rem] leading-tight text-white mb-4 sm:mb-6">
-              Shanthi <span className="text-gold block sm:inline">Jewellers Nellore</span>
+              Shanthi{" "}
+              <span className="text-gold block sm:inline">
+                Jewellers Nellore
+              </span>
             </h1>
             <p className="hero-subtitle text-lg sm:text-xl md:text-2xl text-gray-300 mb-4 font-light">
               The Best Jewellery Shop in Nellore
             </p>
             <p className="hero-subtitle text-sm sm:text-base text-gray-400 mb-8 sm:mb-10 max-w-lg">
-              Since 1960, we bring you the finest <strong>Gold Jewellery</strong> and <strong>Diamond Jewellery</strong> near VRC Centre. Discover our exclusive <strong>Bridal Gold Jewellery</strong>, lightweight designs, and BIS Hallmarked collections.
+              Since 1960, we bring you the finest{" "}
+              <strong>Gold Jewellery</strong> and{" "}
+              <strong>Diamond Jewellery</strong> near VRC Centre. Discover our
+              exclusive <strong>Bridal Gold Jewellery</strong>, lightweight
+              designs, and BIS Hallmarked collections.
             </p>
             <div className="hero-cta flex flex-col sm:flex-row gap-4">
               <a
@@ -841,7 +851,6 @@ function App() {
           </div>
         </div>
       </header>
-
       {/* Collection Section */}
       <section
         id="collections"
@@ -857,7 +866,10 @@ function App() {
               Exclusive Collections
             </h2>
             <p className="text-sm md:text-base text-gray-400 mb-6 md:mb-8 leading-relaxed">
-              Step into a world of refined luxury. Explore our handpicked <strong>Gold Chains in Nellore</strong>, signature bridal sets, delicate pendants, and statement <strong>Gold Bangles</strong> designed to captivate.
+              Step into a world of refined luxury. Explore our handpicked{" "}
+              <strong>Gold Chains in Nellore</strong>, signature bridal sets,
+              delicate pendants, and statement <strong>Gold Bangles</strong>{" "}
+              designed to captivate.
             </p>
             <Link
               to="/collections"
@@ -1030,7 +1042,6 @@ function App() {
           </div>
         </div>
       </section>
-
       {/* Featured Section */}
       <section
         id="featured"
@@ -1046,20 +1057,28 @@ function App() {
               Handpicked Excellence
             </h2>
             <p className="text-sm md:text-base text-gray-400 mb-6 md:mb-8 leading-relaxed">
-              Every piece in our featured collection represents the pinnacle of craftsmanship at our <strong>Jewellery Shop Near SBI Barkas Center</strong>. From intricate antique goldwork to brilliant diamond settings, these pieces define our dedication to purity and style.
+              Every piece in our featured collection represents the pinnacle of
+              craftsmanship at our{" "}
+              <strong>Jewellery Shop Near SBI Barkas Center</strong>. From
+              intricate antique goldwork to brilliant diamond settings, these
+              pieces define our dedication to purity and style.
             </p>
             <div className="grid grid-cols-2 gap-4 md:gap-6 mb-8">
               <div className="border border-white/10 p-4 sm:p-6 text-center">
                 <span className="font-serif text-2xl sm:text-3xl text-gold block mb-1 sm:mb-2">
                   18K/22K
                 </span>
-                <h3 className="text-gray-400 text-xs sm:text-sm">Pure Gold Jewellery</h3>
+                <h3 className="text-gray-400 text-xs sm:text-sm">
+                  Pure Gold Jewellery
+                </h3>
               </div>
               <div className="border border-white/10 p-4 sm:p-6 text-center">
                 <span className="font-serif text-2xl sm:text-3xl text-gold block mb-1 sm:mb-2">
                   IGI
                 </span>
-                <h3 className="text-gray-400 text-xs sm:text-sm">Certified Diamonds</h3>
+                <h3 className="text-gray-400 text-xs sm:text-sm">
+                  Certified Diamonds
+                </h3>
               </div>
             </div>
             <a
@@ -1091,7 +1110,6 @@ function App() {
           </div>
         </div>
       </section>
-
       {/* Categories Section */}
       <section
         id="categories"
@@ -1102,7 +1120,9 @@ function App() {
           <span className="text-gold text-xs sm:text-sm tracking-widest uppercase mb-3 block">
             Discover Our Offerings
           </span>
-          <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl text-white">Shop by Category</h2>
+          <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl text-white">
+            Shop by Category
+          </h2>
         </div>
 
         <div
@@ -1136,7 +1156,8 @@ function App() {
                           return;
                         }
                         target.dataset.fallbackApplied = "true";
-                        target.src = fallbackHomeCategories.find(
+                        target.src =
+                          fallbackHomeCategories.find(
                             (item) => item.slug === category.slug,
                           )?.image || "/cat-rings.jpg";
                       }}
@@ -1172,7 +1193,6 @@ function App() {
           </div>
         </div>
       </section>
-
       {/* Products Section */}
       <section
         id="products"
@@ -1184,7 +1204,9 @@ function App() {
             <span className="text-gold text-xs sm:text-sm tracking-widest uppercase mb-2 md:mb-4 block">
               Nellore Favorites
             </span>
-            <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl text-white">Best Sellers</h2>
+            <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl text-white">
+              Best Sellers
+            </h2>
           </div>
           <Link
             to="/category/rings"
@@ -1291,14 +1313,19 @@ function App() {
           </div>
         </div>
       </section>
-
       {/* Trust Section */}
-      <section id="trust" ref={trustRef} className="py-16 md:py-24 section-padding">
+      <section
+        id="trust"
+        ref={trustRef}
+        className="py-16 md:py-24 section-padding"
+      >
         <div className="text-center mb-10 md:mb-16">
           <span className="text-gold text-xs sm:text-sm tracking-widest uppercase mb-3 block">
             Why Choose Us
           </span>
-          <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl text-white">Our Promise</h2>
+          <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl text-white">
+            Our Promise
+          </h2>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
@@ -1310,7 +1337,8 @@ function App() {
               Certified Quality
             </h3>
             <p className="text-gray-400 text-xs md:text-sm">
-              Authentic <strong>BIS Hallmarked Gold Jewellery</strong> and IGI certified diamonds with 100% guarantee.
+              Authentic <strong>BIS Hallmarked Gold Jewellery</strong> and IGI
+              certified diamonds with 100% guarantee.
             </p>
           </div>
 
@@ -1322,7 +1350,8 @@ function App() {
               Trusted Since 1960
             </h3>
             <p className="text-gray-400 text-xs md:text-sm">
-              We are the most <strong>Trusted Jewellery Store</strong> located near VRC Centre, Nellore.
+              We are the most <strong>Trusted Jewellery Store</strong> located
+              near VRC Centre, Nellore.
             </p>
           </div>
 
@@ -1334,7 +1363,8 @@ function App() {
               Expert Craftsmanship
             </h3>
             <p className="text-gray-400 text-xs md:text-sm">
-              Discover intricate <strong>Antique Jewellery Nellore</strong> crafted by our master artisans.
+              Discover intricate <strong>Antique Jewellery Nellore</strong>{" "}
+              crafted by our master artisans.
             </p>
           </div>
 
@@ -1346,23 +1376,28 @@ function App() {
               Custom Designs
             </h3>
             <p className="text-gray-400 text-xs md:text-sm">
-              Bespoke wedding and bridal design services to bring your dream jewellery to life.
+              Bespoke wedding and bridal design services to bring your dream
+              jewellery to life.
             </p>
           </div>
         </div>
       </section>
-      
       {/* Our Story Section */}
-      <section id="story" ref={storyRef} className="py-16 md:py-24 section-padding bg-charcoal border-t border-white/5">
+      <section
+        id="story"
+        ref={storyRef}
+        className="py-16 md:py-24 section-padding bg-charcoal border-t border-white/5"
+      >
         <div className="max-w-7xl mx-auto">
-          
           <div className="text-center mb-8 md:mb-12 story-content">
             <span className="text-gold text-xs sm:text-sm tracking-widest uppercase mb-3 block">
               Legacy & Heritage of
             </span>
-            <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl text-white">SHANTI JEWELLERY</h2>
+            <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl text-white">
+              SHANTI JEWELLERY
+            </h2>
           </div>
-          
+
           <div className="relative w-full aspect-video mb-10 md:mb-16">
             <iframe
               className="w-full h-full shadow-2xl rounded-sm"
@@ -1376,17 +1411,35 @@ function App() {
 
           <div className="max-w-4xl mx-auto text-center space-y-6 md:space-y-8 text-gray-300 text-base md:text-lg leading-relaxed px-4">
             <p>
-              <span className="text-white font-serif tracking-wider text-lg md:text-xl">SHANTI JEWELLERY</span> was established in the year 1960. Our grandfather Late Sri <span className="text-gold font-medium">JETMAL JAIN</span> Garu established this shop. He is affectionately known as RAMANAIYA GARU.
+              <span className="text-white font-serif tracking-wider text-lg md:text-xl">
+                SHANTI JEWELLERY
+              </span>{" "}
+              was established in the year 1960. Our grandfather Late Sri{" "}
+              <span className="text-gold font-medium">JETMAL JAIN</span> Garu
+              established this shop. He is affectionately known as RAMANAIYA
+              GARU.
             </p>
             <p>
-              This is our third generation in the jewellery business. Each and every ornament carries the <strong className="text-white font-medium">BIS 916 HALLMARK</strong>. All our diamond jewellery is <strong className="text-white font-medium">IGI CERTIFIED</strong>. We never compromise on quality, and customisation is one of our specialties.
+              This is our third generation in the jewellery business. Each and
+              every ornament carries the{" "}
+              <strong className="text-white font-medium">
+                BIS 916 HALLMARK
+              </strong>
+              . All our diamond jewellery is{" "}
+              <strong className="text-white font-medium">IGI CERTIFIED</strong>.
+              We never compromise on quality, and customisation is one of our
+              specialties.
             </p>
             <p>
-              We provide premium GOLD & DIAMOND jewellery with the finest craftsmanship and finely assorted, superior-quality stones. If you are looking for the <strong>Best Jewellery Shop in Nellore</strong>, our handpicked pieces offer unmatched elegance.
+              We provide premium GOLD & DIAMOND jewellery with the finest
+              craftsmanship and finely assorted, superior-quality stones. If you
+              are looking for the{" "}
+              <strong>Best Jewellery Shop in Nellore</strong>, our handpicked
+              pieces offer unmatched elegance.
             </p>
-            
+
             <div className="pt-6">
-              <Button 
+              <Button
                 onClick={() => setIsWhatsAppDialogOpen(true)}
                 className="bg-transparent border border-gold text-gold hover:bg-gold hover:text-charcoal px-6 py-4 md:px-10 md:py-6 text-xs sm:text-sm tracking-widest uppercase transition-all duration-300 w-full sm:w-auto"
               >
@@ -1394,16 +1447,18 @@ function App() {
               </Button>
             </div>
           </div>
-
         </div>
       </section>
-
       {/* NEW: Comprehensive Local SEO Content & FAQ Section */}
-      <section ref={seoSectionRef} className="py-16 md:py-24 section-padding bg-charcoal-dark border-t border-white/5">
+      <section
+        ref={seoSectionRef}
+        className="py-16 md:py-24 section-padding bg-charcoal-dark border-t border-white/5"
+      >
         <div className="max-w-4xl mx-auto text-gray-300">
-          
           <div className="text-center mb-12 seo-content-block">
-            <h2 className="font-serif text-3xl md:text-4xl text-white mb-6">Nellore's Finest Jewellery Collections</h2>
+            <h2 className="font-serif text-3xl md:text-4xl text-white mb-6">
+              Nellore's Finest Jewellery Collections
+            </h2>
             <div className="w-16 h-[2px] bg-gold mx-auto mb-6"></div>
           </div>
 
@@ -1411,78 +1466,121 @@ function App() {
             {/* SEO Article Sections */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div>
-                <h3 className="text-xl font-serif text-white mb-3 text-gold">Bridal Jewellery in Nellore</h3>
+                <h3 className="text-xl font-serif text-white mb-3 text-gold">
+                  Bridal Jewellery in Nellore
+                </h3>
                 <p className="text-sm md:text-base leading-relaxed">
-                  Your wedding day deserves perfection. As the leading destination for <strong>Wedding Jewellery in Nellore</strong>, we craft exquisite bridal sets that blend traditional South Indian aesthetics with modern elegance. From heavy temple-inspired necklaces to delicate maang tikkas, our bridal trousseau makes every bride shine.
+                  Your wedding day deserves perfection. As the leading
+                  destination for <strong>Wedding Jewellery in Nellore</strong>,
+                  we craft exquisite bridal sets that blend traditional South
+                  Indian aesthetics with modern elegance. From heavy
+                  temple-inspired necklaces to delicate maang tikkas, our bridal
+                  trousseau makes every bride shine.
                 </p>
               </div>
               <div>
-                <h3 className="text-xl font-serif text-white mb-3 text-gold">Exclusive Gold & Diamond Range</h3>
+                <h3 className="text-xl font-serif text-white mb-3 text-gold">
+                  Exclusive Gold & Diamond Range
+                </h3>
                 <p className="text-sm md:text-base leading-relaxed">
-                  Explore our vast collection ranging from <strong>Lightweight Gold Jewellery</strong> perfect for daily wear, to spectacular statement pieces. Whether you're searching for authentic <strong>Gold Chains in Nellore</strong> or a brilliantly cut <strong>Diamond Jewellery Store in Nellore</strong>, Shanti Jewellery offers unmatched purity and value.
+                  Explore our vast collection ranging from{" "}
+                  <strong>Lightweight Gold Jewellery</strong> perfect for daily
+                  wear, to spectacular statement pieces. Whether you're
+                  searching for authentic{" "}
+                  <strong>Gold Chains in Nellore</strong> or a brilliantly cut{" "}
+                  <strong>Diamond Jewellery Store in Nellore</strong>, Shanti
+                  Jewellery offers unmatched purity and value.
                 </p>
               </div>
             </div>
 
             {/* Customer Reviews Highlight */}
             <div className="bg-charcoal border border-white/10 p-8 rounded-sm text-center my-10">
-              <h3 className="text-2xl font-serif text-white mb-4">Loved by Generations in Nellore</h3>
+              <h3 className="text-2xl font-serif text-white mb-4">
+                Loved by Generations in Nellore
+              </h3>
               <div className="flex justify-center gap-1 text-gold mb-4">
-                {[1,2,3,4,5].map(star => <span key={star}>★</span>)}
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <span key={star}>★</span>
+                ))}
               </div>
               <p className="italic text-gray-400 text-sm md:text-base max-w-2xl mx-auto">
-                "Shanti Jewellers has been our family's trusted gold shop for decades. Their custom designs and BIS 916 purity guarantee make them the best jewellery shop near VRC Centre."
+                "Shanti Jewellers has been our family's trusted gold shop for
+                decades. Their custom designs and BIS 916 purity guarantee make
+                them the best jewellery shop near VRC Centre."
               </p>
-              <p className="mt-4 font-semibold text-white tracking-wider text-sm">— Rated 4.8 Stars on Google</p>
+              <p className="mt-4 font-semibold text-white tracking-wider text-sm">
+                — Rated 4.8 Stars on Google
+              </p>
             </div>
 
             {/* FAQ Section */}
             <div>
-              <h3 className="text-2xl font-serif text-white mb-6 text-center">Frequently Asked Questions</h3>
+              <h3 className="text-2xl font-serif text-white mb-6 text-center">
+                Frequently Asked Questions
+              </h3>
               <div className="space-y-4">
                 <details className="group border border-white/10 bg-charcoal p-4 cursor-pointer">
                   <summary className="flex justify-between items-center font-medium text-white">
                     What is the best jewellery shop in Nellore?
-                    <span className="transition group-open:rotate-180 text-gold"><ChevronDown size={20} /></span>
+                    <span className="transition group-open:rotate-180 text-gold">
+                      <ChevronDown size={20} />
+                    </span>
                   </summary>
                   <p className="text-gray-400 mt-3 text-sm leading-relaxed">
-                    SHANTI JEWELLERY is widely recognized as the best jewellery shop in Nellore, serving customers since 1960 with premium gold, diamond, and bridal collections.
+                    SHANTI JEWELLERY is widely recognized as the best jewellery
+                    shop in Nellore, serving customers since 1960 with premium
+                    gold, diamond, and bridal collections.
                   </p>
                 </details>
                 <details className="group border border-white/10 bg-charcoal p-4 cursor-pointer">
                   <summary className="flex justify-between items-center font-medium text-white">
                     Does SHANTI JEWELLERY provide BIS Hallmarked jewellery?
-                    <span className="transition group-open:rotate-180 text-gold"><ChevronDown size={20} /></span>
+                    <span className="transition group-open:rotate-180 text-gold">
+                      <ChevronDown size={20} />
+                    </span>
                   </summary>
                   <p className="text-gray-400 mt-3 text-sm leading-relaxed">
-                    Yes, every gold ornament at SHANTI JEWELLERY carries the authentic BIS 916 Hallmark guarantee ensuring absolute purity.
+                    Yes, every gold ornament at SHANTI JEWELLERY carries the
+                    authentic BIS 916 Hallmark guarantee ensuring absolute
+                    purity.
                   </p>
                 </details>
                 <details className="group border border-white/10 bg-charcoal p-4 cursor-pointer">
                   <summary className="flex justify-between items-center font-medium text-white">
                     Where is SHANTI JEWELLERY located in Nellore?
-                    <span className="transition group-open:rotate-180 text-gold"><ChevronDown size={20} /></span>
+                    <span className="transition group-open:rotate-180 text-gold">
+                      <ChevronDown size={20} />
+                    </span>
                   </summary>
                   <p className="text-gray-400 mt-3 text-sm leading-relaxed">
-                    We are centrally located at 2-148, Barkas Center, 17, Achari St, Beside SBI, VRC Centre, Nellore, Andhra Pradesh 524001.
+                    We are centrally located at 2-148, Barkas Center, 17, Achari
+                    St, Beside SBI, VRC Centre, Nellore, Andhra Pradesh 524001.
                   </p>
                 </details>
                 <details className="group border border-white/10 bg-charcoal p-4 cursor-pointer">
                   <summary className="flex justify-between items-center font-medium text-white">
                     Does SHANTI JEWELLERY offer bridal jewellery?
-                    <span className="transition group-open:rotate-180 text-gold"><ChevronDown size={20} /></span>
+                    <span className="transition group-open:rotate-180 text-gold">
+                      <ChevronDown size={20} />
+                    </span>
                   </summary>
                   <p className="text-gray-400 mt-3 text-sm leading-relaxed">
-                    Yes, we specialize in exclusive Bridal Jewellery in Nellore, offering custom wedding jewellery collections, gold necklaces, bangles, and temple jewellery.
+                    Yes, we specialize in exclusive Bridal Jewellery in Nellore,
+                    offering custom wedding jewellery collections, gold
+                    necklaces, bangles, and temple jewellery.
                   </p>
                 </details>
                 <details className="group border border-white/10 bg-charcoal p-4 cursor-pointer">
                   <summary className="flex justify-between items-center font-medium text-white">
                     What are the store timings?
-                    <span className="transition group-open:rotate-180 text-gold"><ChevronDown size={20} /></span>
+                    <span className="transition group-open:rotate-180 text-gold">
+                      <ChevronDown size={20} />
+                    </span>
                   </summary>
                   <p className="text-gray-400 mt-3 text-sm leading-relaxed">
-                    Our store is open from Monday to Saturday, 10:00 AM to 8:30 PM. We are closed on Sundays.
+                    Our store is open from Monday to Saturday, 10:00 AM to 8:30
+                    PM. We are closed on Sundays.
                   </p>
                 </details>
               </div>
@@ -1490,7 +1588,6 @@ function App() {
           </div>
         </div>
       </section>
-
       {/* CTA Section */}
       <section className="py-16 md:py-24 section-padding bg-gold/5">
         <div className="max-w-4xl mx-auto text-center px-4">
@@ -1498,8 +1595,9 @@ function App() {
             Ready to Find Your Perfect Piece?
           </h2>
           <p className="text-gray-300 mb-8 md:mb-10 max-w-2xl mx-auto text-sm md:text-base">
-            Our jewelry experts at the VRC Centre store are here to help you discover the perfect piece.
-            Book an appointment for a personalized consultation or reach out to us on WhatsApp.
+            Our jewelry experts at the VRC Centre store are here to help you
+            discover the perfect piece. Book an appointment for a personalized
+            consultation or reach out to us on WhatsApp.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Button
@@ -1520,18 +1618,25 @@ function App() {
           </div>
         </div>
       </section>
-
       {/* Visit Us / Map Section */}
-      <section id="visit" ref={mapSectionRef} className="py-16 md:py-24 section-padding bg-charcoal relative border-t border-white/5">
+      <section
+        id="visit"
+        ref={mapSectionRef}
+        className="py-16 md:py-24 section-padding bg-charcoal relative border-t border-white/5"
+      >
         <div className="max-w-7xl mx-auto">
-          
           {/* Section Header */}
           <div className="text-center mb-12 md:mb-16">
-            <span className="text-gold text-xs sm:text-sm tracking-widest uppercase mb-3 block">Our Location in Nellore</span>
-            <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl text-white mb-4 md:mb-6">Visit Shanti Jewellers</h2>
+            <span className="text-gold text-xs sm:text-sm tracking-widest uppercase mb-3 block">
+              Our Location in Nellore
+            </span>
+            <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl text-white mb-4 md:mb-6">
+              Visit Shanti Jewellers
+            </h2>
             <div className="w-12 h-[2px] md:w-16 bg-gold mx-auto mb-4 md:mb-6"></div>
             <p className="text-gray-400 text-sm md:text-lg max-w-2xl mx-auto">
-              We invite you to our flagship store near SBI Barkas Center to explore our exclusive collections.
+              We invite you to our flagship store near SBI Barkas Center to
+              explore our exclusive collections.
             </p>
           </div>
 
@@ -1542,13 +1647,17 @@ function App() {
               <div className="w-12 h-12 md:w-14 md:h-14 bg-charcoal border border-gold/30 rounded-full flex items-center justify-center mb-4 md:mb-6 group-hover:scale-110 transition-transform duration-500">
                 <MapPin className="w-5 h-5 md:w-6 md:h-6 text-gold" />
               </div>
-              <h3 className="text-white font-serif text-lg md:text-xl mb-3">Address</h3>
+              <h3 className="text-white font-serif text-lg md:text-xl mb-3">
+                Address
+              </h3>
               <p className="text-gray-400 text-xs md:text-sm leading-relaxed mb-4 md:mb-6 flex-grow">
-                2-148, Barkas Center,<br />
-                17, Achari St, beside SBI,<br />
+                2-148, Barkas Center,
+                <br />
+                17, Achari St, beside SBI,
+                <br />
                 VRC Centre, Nellore, AP 524001
               </p>
-              <a 
+              <a
                 href="https://www.google.com/maps/dir/?api=1&destination=17/440,+Achari+St,+beside+SBI,+Barkas+Center,+VRC+Centre,+Nellore,+Andhra+Pradesh+524001"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -1563,12 +1672,20 @@ function App() {
               <div className="w-12 h-12 md:w-14 md:h-14 bg-charcoal border border-gold/30 rounded-full flex items-center justify-center mb-4 md:mb-6 group-hover:scale-110 transition-transform duration-500">
                 <Phone className="w-5 h-5 md:w-6 md:h-6 text-gold" />
               </div>
-              <h3 className="text-white font-serif text-lg md:text-xl mb-3">Contact</h3>
+              <h3 className="text-white font-serif text-lg md:text-xl mb-3">
+                Contact
+              </h3>
               <div className="flex-grow flex flex-col justify-center space-y-1 md:space-y-2">
-                <a href="tel:09039039056" className="text-gray-400 hover:text-gold transition-colors text-base md:text-lg">
+                <a
+                  href="tel:09039039056"
+                  className="text-gray-400 hover:text-gold transition-colors text-base md:text-lg"
+                >
                   +91 90390 39056
                 </a>
-                <a href="tel:09039039057" className="text-gray-400 hover:text-gold transition-colors text-base md:text-lg">
+                <a
+                  href="tel:09039039057"
+                  className="text-gray-400 hover:text-gold transition-colors text-base md:text-lg"
+                >
                   +91 90390 39057
                 </a>
               </div>
@@ -1579,11 +1696,19 @@ function App() {
               <div className="w-12 h-12 md:w-14 md:h-14 bg-charcoal border border-gold/30 rounded-full flex items-center justify-center mb-4 md:mb-6 group-hover:scale-110 transition-transform duration-500">
                 <Calendar className="w-5 h-5 md:w-6 md:h-6 text-gold" />
               </div>
-              <h3 className="text-white font-serif text-lg md:text-xl mb-3">Store Hours</h3>
+              <h3 className="text-white font-serif text-lg md:text-xl mb-3">
+                Store Hours
+              </h3>
               <div className="flex-grow flex flex-col justify-center">
-                <p className="text-gray-400 text-xs md:text-sm mb-1 md:mb-2">Monday - Saturday</p>
-                <p className="text-white font-medium mb-3 md:mb-4 text-sm md:text-base">10:00 AM - 8:30 PM</p>
-                <p className="text-gold/80 text-[10px] md:text-xs tracking-widest uppercase">Sunday Closed</p>
+                <p className="text-gray-400 text-xs md:text-sm mb-1 md:mb-2">
+                  Monday - Saturday
+                </p>
+                <p className="text-white font-medium mb-3 md:mb-4 text-sm md:text-base">
+                  10:00 AM - 8:30 PM
+                </p>
+                <p className="text-gold/80 text-[10px] md:text-xs tracking-widest uppercase">
+                  Sunday Closed
+                </p>
               </div>
             </div>
           </div>
@@ -1603,10 +1728,8 @@ function App() {
               ></iframe>
             </div>
           </div>
-
         </div>
       </section>
-
       {/* Footer */}
       <footer className="py-12 md:py-16 section-padding bg-charcoal-dark border-t border-white/5">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 md:gap-12 mb-10 md:mb-12">
@@ -1672,7 +1795,7 @@ function App() {
                 <img
                   src="/youtubeicon.png"
                   alt="YouTube"
-                  className="w-16 h-16 md:w-20 md:h-20 object-contain" 
+                  className="w-16 h-16 md:w-20 md:h-20 object-contain"
                   loading="lazy"
                   decoding="async"
                 />
@@ -1695,7 +1818,9 @@ function App() {
           </div>
 
           <div>
-            <h4 className="font-serif text-base md:text-lg text-white mb-4 md:mb-6">Quick Links</h4>
+            <h4 className="font-serif text-base md:text-lg text-white mb-4 md:mb-6">
+              Quick Links
+            </h4>
             <ul className="space-y-2 md:space-y-3">
               <li>
                 <a
@@ -1773,7 +1898,9 @@ function App() {
           </div>
 
           <div>
-            <h4 className="font-serif text-base md:text-lg text-white mb-4 md:mb-6">Contact</h4>
+            <h4 className="font-serif text-base md:text-lg text-white mb-4 md:mb-6">
+              Contact
+            </h4>
             <ul className="space-y-3 md:space-y-4">
               <li className="flex items-start gap-2 md:gap-3">
                 <MapPin className="w-4 h-4 md:w-5 md:h-5 text-gold flex-shrink-0 mt-0.5" />
@@ -1784,7 +1911,9 @@ function App() {
               </li>
               <li className="flex items-center gap-2 md:gap-3">
                 <Phone className="w-4 h-4 md:w-5 md:h-5 text-gold flex-shrink-0" />
-                <span className="text-gray-400 text-xs md:text-sm">+91 90390 39056</span>
+                <span className="text-gray-400 text-xs md:text-sm">
+                  +91 90390 39056
+                </span>
               </li>
               <li className="flex items-center gap-2 md:gap-3">
                 <Mail className="w-4 h-4 md:w-5 md:h-5 text-gold flex-shrink-0" />
@@ -1797,12 +1926,12 @@ function App() {
         </div>
 
         <div className="pt-6 md:pt-8 border-t  border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
-          <div className="items-center"> 
-          <p className="text-gray-500 text-xs md:text-sm">
-            © 2026 SHANTI JEWELLERY. All rights reserved.
-          </p>
+          <div className="items-center">
+            <p className="text-gray-500 text-xs md:text-sm">
+              © 2026 SHANTI JEWELLERY. All rights reserved.
+            </p>
           </div>
-          
+
           <div className="flex flex-wrap justify-center gap-4 md:gap-6">
             <a
               href="#"
@@ -1819,7 +1948,6 @@ function App() {
           </div>
         </div>
       </footer>
-
       {/* Product Dialog */}
       <Dialog open={isProductDialogOpen} onOpenChange={setIsProductDialogOpen}>
         <DialogContent className="bg-charcoal border-white/10 max-w-md md:max-w-4xl max-h-[90vh] overflow-y-auto mx-2 sm:mx-auto">
@@ -1856,13 +1984,17 @@ function App() {
                       <span className="text-gray-400 text-[10px] md:text-xs block">
                         Purity
                       </span>
-                      <span className="text-white text-sm md:text-base">18K Gold</span>
+                      <span className="text-white text-sm md:text-base">
+                        18K Gold
+                      </span>
                     </div>
                     <div className="flex-1 border border-white/10 p-2 md:p-3 text-center rounded-sm">
                       <span className="text-gray-400 text-[10px] md:text-xs block">
                         Weight
                       </span>
-                      <span className="text-white text-sm md:text-base">12.5g</span>
+                      <span className="text-white text-sm md:text-base">
+                        12.5g
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -1888,7 +2020,6 @@ function App() {
           )}
         </DialogContent>
       </Dialog>
-
       {/* WhatsApp Dialog */}
       <Dialog
         open={isWhatsAppDialogOpen}
@@ -1933,7 +2064,6 @@ function App() {
           </div>
         </DialogContent>
       </Dialog>
-
       {/* Appointment Dialog */}
       <Dialog
         open={isAppointmentDialogOpen}
@@ -1947,7 +2077,8 @@ function App() {
           </DialogHeader>
           <div className="py-4 md:py-6">
             <p className="text-gray-300 text-center mb-4 md:mb-6 text-sm md:text-base">
-              Schedule a personalized consultation with our jewelry experts at our Nellore branch.
+              Schedule a personalized consultation with our jewelry experts at
+              our Nellore branch.
             </p>
             <form className="space-y-3 md:space-y-4">
               <div>
@@ -2000,7 +2131,6 @@ function App() {
           </div>
         </DialogContent>
       </Dialog>
-
       {/* Floating WhatsApp Button */}
       <button
         type="button"
