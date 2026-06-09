@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://shanti-jewellers-website.vercel.app/sitemap.xml
