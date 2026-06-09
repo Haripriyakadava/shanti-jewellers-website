@@ -46,7 +46,6 @@ import {
   getWishlistIds,
   toggleWishlistItem,
 } from "@/lib/shop-storage";
-import { buildTenantWhatsappHref } from "@/lib/whatsapp";
 import {
   fetchAllCategories,
   fetchAllCollections,
@@ -1797,10 +1796,13 @@ function App() {
           </div>
         </div>
 
-        <div className="pt-6 md:pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
+        <div className="pt-6 md:pt-8 border-t  border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
+          <div className="items-center"> 
           <p className="text-gray-500 text-xs md:text-sm">
-            © 2026 SHANTI JEWELLERY. All rights reserved. Best Jewellery Shop in Nellore.
+            © 2026 SHANTI JEWELLERY. All rights reserved.
           </p>
+          </div>
+          
           <div className="flex flex-wrap justify-center gap-4 md:gap-6">
             <a
               href="#"
