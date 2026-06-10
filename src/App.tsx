@@ -58,7 +58,158 @@ import {
 } from "@/lib/shop-api";
 
 gsap.registerPlugin(ScrollTrigger);
+export const StarIcon = () => (
+  <svg
+    className="w-4 h-4 md:w-5 md:h-5 text-gold fill-gold"
+    viewBox="0 0 24 24"
+  >
+    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+  </svg>
+);
 
+export const GoogleIcon = () => (
+  <svg className="w-5 h-5 md:w-6 md:h-6" viewBox="0 0 24 24" aria-hidden="true">
+    <path
+      fill="#4285F4"
+      d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+    />
+    <path
+      fill="#34A853"
+      d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+    />
+    <path
+      fill="#FBBC05"
+      d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+    />
+    <path
+      fill="#EA4335"
+      d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+    />
+  </svg>
+);
+
+export const googleReviews = [
+  {
+    id: 1,
+    name: "Kishan Reddy",
+    time: "10 months ago",
+    text: "After exploring few gold shops in Nellore, I found very fresh and unique designs here. The best thing is customisation is done exactly according to my requirements!",
+  },
+  {
+    id: 2,
+    name: "Bhachu Hemavathi",
+    time: "4 months ago",
+    text: "Best jewellery shop in Nellore. Very nice models, honest purity, and less price compared to the market showrooms.",
+  },
+  {
+    id: 3,
+    name: "Vivek Panchananam",
+    time: "1 year ago",
+    text: "Worked with Dixit to create a custom engagement ring. We consulted every week on every small detail of this ring. Exceptional workmanship and attention to detail!",
+  },
+  {
+    id: 4,
+    name: "Keerthy Gangavarapu",
+    time: "2 months ago",
+    text: "I purchased a set of gold earrings online seeing their Instagram page. From day one, they gave daily updates and the secure shipping was done very safely. Best for online gold purchases!",
+  },
+  {
+    id: 5,
+    name: "Parvez Muskana",
+    time: "9 months ago",
+    text: "I recently purchased gold earring studs from Shanthi Jewellers and couldn't be happier with the elegant design finishing and modern luxury touch.",
+  },
+  {
+    id: 6,
+    name: "Maddisetty Sravani",
+    time: "3 months ago",
+    text: "Good receiving, polite staff, and very nice collection of bridal jewelry at the best price. Thank you so much sir!",
+  },
+  {
+    id: 7,
+    name: "Swapna Reddy",
+    time: "2 years ago",
+    text: "Best jewellery shop in nellore. Selective unique designs, low wastage, low price, and high quality. Bangaru konali ante SHANTI JEWELRY ki ravalsinde!",
+  },
+  {
+    id: 8,
+    name: "Sai Reddy",
+    time: "2 months ago",
+    text: "Models are very beautiful. No one has these premium lightweight gold jewellery models in Nellore. Friendly staff with great patience.",
+  },
+  {
+    id: 9,
+    name: "Bike Kumar143",
+    time: "10 months ago",
+    text: "Super shop. We have been purchasing our gold ornaments here for over 20 years. Full trust, high guarantee, and pure relation.",
+  },
+  {
+    id: 10,
+    name: "Sambhawaami Studios",
+    time: "3 months ago",
+    text: "Variety and grand collections. We specifically travelled all the way from Tirupati to their Nellore store after seeing their unique Instagram posts!",
+  },
+  {
+    id: 11,
+    name: "Mrudula Gollapudi",
+    time: "1 year ago",
+    text: "This shop has a very wide range of collections, especially their contemporary diamond jewellery is stunning. Shared a necklace image and they made an exact, beautiful replica.",
+  },
+  {
+    id: 12,
+    name: "Srikanth Vinnamala",
+    time: "11 months ago",
+    text: "Excellent place for gold and silver in Nellore near VRC centre. Has a lot of models and reasonable pricing on wastage.",
+  },
+  {
+    id: 13,
+    name: "Gokarnam Revathi",
+    time: "4 years ago",
+    text: "Very reasonable price and less wastage than the market. Totally BIS Hallmarked gold jewellery. I am happy and satisfied with the custom design and discounts.",
+  },
+  {
+    id: 14,
+    name: "Priyanka Avisa",
+    time: "3 years ago",
+    text: "I ordered custom gold anklets which were delivered in just one day! The design is beautiful. If you have any bridal design in mind, they bring it to life.",
+  },
+  {
+    id: 15,
+    name: "Jyothi Avisa",
+    time: "4 years ago",
+    text: "Excellent designs. We purchased our traditional tali chain and gold necklace last time. Very reasonable price and high certified quality.",
+  },
+  {
+    id: 16,
+    name: "Srinivasulu Tr",
+    time: "3 months ago",
+    text: "Very good contemporary and traditional gold designs with the best discount prices in Nellore market.",
+  },
+  {
+    id: 17,
+    name: "Sai Swetha K.",
+    time: "1 week ago",
+    text: "Good experience and nice collection. Will definitely recommend Shanti Jewellers for anyone looking for bridal gold designs.",
+  },
+  {
+    id: 18,
+    name: "Dayakar Reddy",
+    time: "1 year ago",
+    text: "Shanti shop is very good and the hospitality is great. The jewellery layout is nice and they received us very well. Must visit!",
+  },
+  {
+    id: 19,
+    name: "Neeraja Velineni",
+    time: "2 years ago",
+    text: "The counter staff is nice, professional, and deeply caring. They show models with infinite patience until you find the right fit.",
+  },
+  {
+    id: 20,
+    name: "Mohammed Khan",
+    time: "4 years ago",
+    text: "Got the best exchange value for my old gold items when purchasing a new gold ring here. Highly transparent and clear process.",
+  },
+];
 const fallbackLandingCollections: ShopCollection[] =
   localLandingCollections.map((collection, index) => ({
     id: index + 1,
@@ -171,7 +322,8 @@ function App() {
   const trustRef = useRef<HTMLDivElement>(null);
   const seoSectionRef = useRef<HTMLDivElement>(null);
   const mapSectionRef = useRef<HTMLDivElement>(null);
-
+  const reviewCarouselRef = useRef<HTMLDivElement>(null);
+  const [isCarouselHovered, setIsCarouselHovered] = useState(false);
   const openWhatsAppInquiry = async (message: string) => {
     if (isOpeningWhatsApp) {
       return;
@@ -446,7 +598,31 @@ function App() {
       isMounted = false;
     };
   }, []);
+// Auto-scroll logic for Google Reviews carousel
+  useEffect(() => {
+    // This is where isCarouselHovered is USED! It pauses the scroll.
+    if (isCarouselHovered) return;
 
+    const carousel = reviewCarouselRef.current;
+    if (!carousel) return;
+
+    const scrollInterval = setInterval(() => {
+      const firstChild = carousel.firstElementChild as HTMLElement;
+      if (!firstChild) return;
+
+      // Card width + Gap spacing
+      const scrollAmount = firstChild.clientWidth + 24;
+
+      // Check if we reached the end of the scroll
+      if (carousel.scrollLeft + carousel.clientWidth >= carousel.scrollWidth - 10) {
+        carousel.scrollTo({ left: 0, behavior: "smooth" });
+      } else {
+        carousel.scrollBy({ left: scrollAmount, behavior: "smooth" });
+      }
+    }, 3500); // Slides every 3.5 seconds
+
+    return () => clearInterval(scrollInterval);
+  }, [isCarouselHovered]); // React triggers this whenever hover state changes
   const toggleWishlist = (id: number) => {
     const isAdding = !wishlist.includes(id);
     const updated = toggleWishlistItem(id);
@@ -603,13 +779,13 @@ function App() {
             >
               <img
                 src="/shantilogo.png"
-                alt="Shanthi Jewellers Nellore Official Logo"
+                alt="Shanti JEWELLERY Nellore Official Logo"
                 width="60"
                 height="56"
                 className="w-10 h-10 sm:w-12 sm:h-12 md:w-[60px] md:h-14 object-contain"
               />
               <span className="font-serif text-lg sm:text-xl tracking-wider uppercase">
-                SHANTI <span className="text-gold">JEWELLERS</span>
+                SHANTI <span className="text-gold">JEWELLERY</span>
               </span>
             </button>
 
@@ -817,9 +993,9 @@ function App() {
           <div className="max-w-2xl px-4 sm:px-0">
             {/* SEO Optimized H1 Header combining Brand and Location */}
             <h1 className="hero-title font-serif text-5xl sm:text-6xl md:text-7xl lg:text-[5.5rem] leading-tight text-white mb-4 sm:mb-6">
-              Shanthi{" "}
+              Shanti{" "}
               <span className="text-gold block sm:inline">
-                Jewellers Nellore
+                JEWELLERY Nellore
               </span>
             </h1>
             <p className="hero-subtitle text-lg sm:text-xl md:text-2xl text-gray-300 mb-4 font-light">
@@ -901,7 +1077,7 @@ function App() {
                   <div className="relative aspect-[2/3] overflow-hidden bg-charcoal-dark">
                     <img
                       src={collection.image}
-                      alt={`${collection.name} - Shanti Jewellers Nellore`}
+                      alt={`${collection.name} - Shanti JEWELLERY Nellore`}
                       loading="lazy"
                       className={`w-full h-full object-cover transform-gpu will-change-opacity transition-all duration-1000 ease-in-out group-hover:scale-110 ${
                         (collection.slug === "bridal-collection" &&
@@ -1381,6 +1557,61 @@ function App() {
             </p>
           </div>
         </div>
+
+        {/* NEW: Certifications Logo Banner */}
+        <div className="mt-16 md:mt-20 pt-10 md:pt-12 border-t border-white/10 text-center">
+          <span className="text-gray-400 text-xs sm:text-sm  md:text-lg tracking-widest uppercase mb-8 block">
+            Certified & Recognized By
+          </span>
+          <div className="flex flex-wrap justify-center items-center gap-10 md:gap-20">
+            <img
+              src="/bis.png"
+              alt="BIS Hallmark Certified Jewellery Nellore"
+              loading="lazy"
+              className="h-32 md:h-36 lg:h-52 w-auto object-contain hover:scale-110 transition-transform duration-500"
+            />
+            <img
+              src="/igi.png"
+              alt="IGI Certified Diamonds Nellore"
+              loading="lazy"
+              className="h-32 md:h-36 lg:h-52 w-auto object-contain hover:scale-110 transition-transform duration-500"
+            />
+            <img
+              src="/giaicon.png"
+              alt="GIA Certified Diamonds Nellore"
+              loading="lazy"
+              className="h-32 md:h-36 lg:h-52 w-auto object-contain hover:scale-110 transition-transform duration-500"
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* Secure Delivery Partner Section */}
+      <section className="py-12 md:py-16 border-t border-b border-white/10 bg-charcoal/50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <span className="text-gold text-xs sm:text-sm tracking-widest uppercase mb-4 block">
+            100% Insured & Safe Shipping
+          </span>
+          <h2 className="font-serif text-2xl md:text-3xl lg:text-4xl text-white mb-4 md:mb-6">
+            Our Secure Delivery Partner
+          </h2>
+          <p className="text-gray-400 text-sm md:text-base max-w-2xl mx-auto mb-8 md:mb-12 leading-relaxed">
+            We deliver your precious jewellery safely and securely anywhere in Andhra Pradesh. 
+            Every single shipment is fully insured, highly guarded, and tracked straight to your doorstep.
+          </p>
+          
+          <div className="flex flex-col mx-auto text-center align-middle items-center">
+            <img 
+              src="/sequel-logo.png" 
+              alt="Sequel Logistics - Secure Jewellery Delivery Partner Andhra Pradesh" 
+              loading="lazy"
+              className=" w-auto object-contain hover:scale-105 transition-transform duration-500 mb-4" 
+            />
+            <p className="text-gray-500 text-xs md:text-sm tracking-wide">
+              Trusted Logistics for Precious Commodities
+            </p>
+          </div>
+        </div>
       </section>
       {/* Our Story Section */}
       <section
@@ -1402,7 +1633,7 @@ function App() {
             <iframe
               className="w-full h-full shadow-2xl rounded-sm"
               src="https://www.youtube.com/embed/M3qSUH2_soo?autoplay=1&mute=1&loop=1&playlist=M3qSUH2_soo"
-              title="Shanti Jewellers Nellore Our Story"
+              title="Shanti JEWELLERY Nellore Our Story"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
               style={{ border: 0 }}
@@ -1493,27 +1724,95 @@ function App() {
                 </p>
               </div>
             </div>
-
+          
             {/* Customer Reviews Highlight */}
-            <div className="bg-charcoal border border-white/10 p-8 rounded-sm text-center my-10">
-              <h3 className="text-2xl font-serif text-white mb-4">
-                Loved by Generations in Nellore
-              </h3>
-              <div className="flex justify-center gap-1 text-gold mb-4">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <span key={star}>★</span>
+            {/* Scrolling Container for 20 Real Reviews */}
+            {/* Google Reviews Horizontal Carousel */}
+            <div className="my-16">
+              <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8">
+                <div>
+                  <h3 className="text-2xl md:text-3xl font-serif text-white mb-2">
+                    Loved by Generations in Nellore
+                  </h3>
+                  <div className="flex items-center gap-3">
+                    <span className="text-xl md:text-2xl font-semibold text-white">
+                      4.8
+                    </span>
+                    <div className="flex gap-1">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <StarIcon key={`header-star-${star}`} />
+                      ))}
+                    </div>
+                    <span className="text-gray-400 text-sm">
+                      (330+ Google Reviews)
+                    </span>
+                  </div>
+                </div>
+                <a
+                  href="https://www.google.com/search?q=shanti+jewellers+nellore"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-4 sm:mt-0 text-gold hover:text-white transition-colors text-sm flex items-center gap-2"
+                >
+                  Write a review <ArrowRight className="w-4 h-4" />
+                </a>
+              </div>
+
+              {/* Auto-Scrolling Container for 20 Real Reviews */}
+              <div
+                ref={reviewCarouselRef}
+                onMouseEnter={() => setIsCarouselHovered(true)}
+                onMouseLeave={() => setIsCarouselHovered(false)}
+                onTouchStart={() => setIsCarouselHovered(true)}
+                onTouchEnd={() => setIsCarouselHovered(false)}
+                className="flex overflow-x-auto overscroll-x-contain scrollbar-hide snap-x snap-mandatory gap-4 md:gap-6 pb-4 -mx-4 px-4 sm:mx-0 sm:px-0 scroll-smooth"
+              >
+              {googleReviews.map((review) => (
+                  <div 
+                    key={review.id} 
+                    // FIX: Changed from min-w to strict w-[...] to prevent horizontal stretching
+                    className="bg-charcoal border border-white/10 p-6 md:p-8 rounded-sm snap-center flex flex-col justify-between w-full shrink-0 hover:border-gold/30 transition-colors text-left"
+                  >
+                    <div className="flex flex-col h-full w-full">
+                      
+                      {/* Top Row: Profile & Google Icon */}
+                      <div className="flex justify-between items-start mb-5 w-full">
+                        <div className="flex items-center gap-3 overflow-hidden">
+                          {/* Avatar */}
+                          <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gold/20 text-gold flex items-center justify-center font-serif text-lg md:text-xl font-bold shrink-0">
+                            {review.name.charAt(0)}
+                          </div>
+                          
+                          {/* Name & Time */}
+                          <div className="flex flex-col items-start overflow-hidden">
+                            <h4 className="text-white font-medium text-sm md:text-base leading-snug truncate max-w-full">
+                              {review.name}
+                            </h4>
+                            <span className="text-gray-500 text-xs md:text-sm mt-0.5">{review.time}</span>
+                          </div>
+                        </div>
+                        
+                        {/* Google Icon anchored to the right */}
+                        <div className="shrink-0 pt-1 pl-2">
+                          <GoogleIcon />
+                        </div>
+                      </div>
+
+                      {/* Stars */}
+                      <div className="flex gap-1 mb-4">
+                        {[1, 2, 3, 4, 5].map((star) => <StarIcon key={`star-${review.id}-${star}`} />)}
+                      </div>
+
+                      {/* Review Text - Forced to wrap correctly */}
+                      <p className="text-gray-300 text-sm md:text-base leading-relaxed italic whitespace-normal break-words">
+                        "{review.text}"
+                      </p>
+                      
+                    </div>
+                  </div>
                 ))}
               </div>
-              <p className="italic text-gray-400 text-sm md:text-base max-w-2xl mx-auto">
-                "Shanti Jewellers has been our family's trusted gold shop for
-                decades. Their custom designs and BIS 916 purity guarantee make
-                them the best jewellery shop near VRC Centre."
-              </p>
-              <p className="mt-4 font-semibold text-white tracking-wider text-sm">
-                — Rated 4.8 Stars on Google
-              </p>
             </div>
-
             {/* FAQ Section */}
             <div>
               <h3 className="text-2xl font-serif text-white mb-6 text-center">
@@ -1631,7 +1930,7 @@ function App() {
               Our Location in Nellore
             </span>
             <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl text-white mb-4 md:mb-6">
-              Visit Shanti Jewellers
+              Visit Shanti JEWELLERY
             </h2>
             <div className="w-12 h-[2px] md:w-16 bg-gold mx-auto mb-4 md:mb-6"></div>
             <p className="text-gray-400 text-sm md:text-lg max-w-2xl mx-auto">
@@ -1718,8 +2017,8 @@ function App() {
             <div className="absolute -inset-1 bg-gradient-to-r from-gold/20 via-gold/5 to-gold/20 blur-sm"></div>
             <div className="relative w-full h-[300px] md:h-[450px] bg-charcoal-light border border-white/20 p-2">
               <iframe
-                title="Shanti Jewellers Nellore Google Maps Location"
-                src="https://www.google.com/maps?q=Shanti+Jewellers,+17/440,+Achari+St,+Nellore,+Andhra+Pradesh+524001&output=embed"
+                title="Shanti JEWELLERY Nellore Google Maps Location"
+                src="https://www.google.com/maps?q=Shanti+JEWELLERY,+17/440,+Achari+St,+Nellore,+Andhra+Pradesh+524001&output=embed"
                 className="w-full h-full"
                 style={{ border: 0 }}
                 allowFullScreen={true}
@@ -1737,12 +2036,12 @@ function App() {
             <div className="flex items-center gap-2 md:gap-3 mb-4">
               <img
                 src="/shantilogo.png"
-                alt="Shanti Jewellers Logo Nellore"
+                alt="Shanti JEWELLERY Logo Nellore"
                 loading="lazy"
                 className="w-10 h-10 md:w-12 md:h-12 lg:w-[60px] lg:h-14 object-contain"
               />
               <span className="font-serif text-lg md:text-xl tracking-wider uppercase">
-                SHANTI <span className="text-gold">JEWELLERS</span>
+                SHANTI <span className="text-gold">JEWELLERY</span>
               </span>
             </div>
             <p className="text-gray-400 text-xs md:text-sm mb-6 leading-relaxed">
