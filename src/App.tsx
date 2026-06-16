@@ -18,7 +18,7 @@ import {
   Calendar,
   ChevronDown,
 } from "lucide-react";
-import { SeoHead } from "./components/SeoHead"; // <-- IMPORT ADDED HERE
+import { SeoHead } from "./components/SeoHead";
 
 // Custom WhatsApp Icon
 const WhatsAppIcon = ({ className }: { className?: string }) => (
@@ -39,7 +39,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useCart } from "@/context/CartContext";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { categories as localCatalogCategories } from "@/data/catalog";
 import { collections as localLandingCollections } from "@/data/collections";
 import {
   getShopStorageEventName,
@@ -52,12 +51,12 @@ import {
   fetchBestSellerProducts,
   fetchMetalPriceTicker,
   type ShopProductCard,
-  type ShopCategory,
   type ShopCollection,
   type ShopMetalPriceTickerItem,
 } from "@/lib/shop-api";
 
 gsap.registerPlugin(ScrollTrigger);
+
 export const StarIcon = () => (
   <svg
     className="w-4 h-4 md:w-5 md:h-5 text-gold fill-gold"
@@ -232,6 +231,7 @@ export const googleReviews = [
     text: "Got the best exchange value for my old gold items when purchasing a new gold ring here. Highly transparent and clear process.",
   },
 ];
+
 const fallbackLandingCollections: ShopCollection[] =
   localLandingCollections.map((collection, index) => ({
     id: index + 1,
@@ -248,39 +248,14 @@ const PRIORITY_COLLECTION_SLUGS = [
   "diamond-essentials",
 ] as const;
 
+const fallbackGoldPriceTicker: ShopMetalPriceTickerItem[] = [];
+
 type HomeCategory = {
   id: number;
   name: string;
   slug: string;
   image: string;
-  count: number;
 };
-
-const fallbackHomeCategories: HomeCategory[] = localCatalogCategories.map(
-  (category, index) => ({
-    id: index + 1,
-    name: category.name,
-    slug: category.name.toLowerCase().trim().replace(/\s+/g, "-"),
-    image: category.image,
-    count: category.count,
-  }),
-);
-
-const fallbackGoldPriceTicker: ShopMetalPriceTickerItem[] = [];
-
-function mapShopCategoryToHomeCategory(category: ShopCategory): HomeCategory {
-  const fallbackMatch = fallbackHomeCategories.find(
-    (item) => item.slug === category.slug,
-  );
-
-  return {
-    id: category.id,
-    name: category.name,
-    slug: category.slug,
-    image: category.image || fallbackMatch?.image || "/cat-rings.jpg",
-    count: category.productCount ?? 0,
-  };
-}
 
 function App() {
   const navigate = useNavigate();
@@ -293,6 +268,11 @@ function App() {
   const [isWhatsAppDialogOpen, setIsWhatsAppDialogOpen] = useState(false);
   const [isAppointmentDialogOpen, setIsAppointmentDialogOpen] = useState(false);
   const [wishlist, setWishlist] = useState<number[]>(() => getWishlistIds());
+  
+  // Category State
+  const [landingCategories, setLandingCategories] = useState<HomeCategory[]>([]);
+  const [isCategoriesLoading, setIsCategoriesLoading] = useState(true);
+
   const [isHeroVideoReady, setIsHeroVideoReady] = useState(false);
   const [isBridalVideoReady, setIsBridalVideoReady] = useState(false);
   const [hasBridalVideoError, setHasBridalVideoError] = useState(false);
@@ -308,9 +288,6 @@ function App() {
   const [landingCollections, setLandingCollections] = useState<
     ShopCollection[]
   >(fallbackLandingCollections);
-  const [landingCategories, setLandingCategories] = useState<HomeCategory[]>(
-    fallbackHomeCategories,
-  );
   const [bestSellerProducts, setBestSellerProducts] = useState<
     ShopProductCard[]
   >([]);
@@ -347,8 +324,7 @@ function App() {
   const reviewCarouselRef = useRef<HTMLDivElement>(null);
   const [isCarouselHovered, setIsCarouselHovered] = useState(false);
 
-  // 1. Carousel Refs & Hover States
-  // 2. Live Market Rates State
+  // Live Market Rates State
   const [liveRates, setLiveRates] = useState({
     gold24k: 0,
     gold22k: 0,
@@ -356,6 +332,7 @@ function App() {
     loading: true,
     lastUpdated: "",
   });
+
   const openWhatsAppInquiry = async (message: string) => {
     if (isOpeningWhatsApp) {
       return;
@@ -495,6 +472,7 @@ function App() {
         stagger: 0.15,
         ease: "power3.out",
       });
+
       // Story section
       gsap.from(".story-content", {
         scrollTrigger: {
@@ -506,17 +484,6 @@ function App() {
         duration: 1,
         ease: "power3.out",
       });
-
-      // gsap.from(".story-image", {
-      //   scrollTrigger: {
-      //     trigger: storyRef.current,
-      //     start: "top 75%",
-      //   },
-      //   opacity: 0,
-      //   x: -50,
-      //   duration: 1,
-      //   ease: "power3.out",
-      // });
 
       // SEO Block Reveal
       gsap.from(".seo-content-block", {
@@ -560,6 +527,7 @@ function App() {
       window.removeEventListener("storage", syncWishlist);
     };
   }, []);
+
   // Fetch Free Live Gold & Silver API (No Key Required)
   useEffect(() => {
     const fetchLiveRates = async () => {
@@ -626,69 +594,12 @@ function App() {
 
     return () => clearInterval(interval);
   }, []);
-  <div className="max-w-4xl mx-auto mb-16 bg-white/5 border border-gold/30 rounded-lg p-6 backdrop-blur-sm shadow-xl relative overflow-hidden">
-    <div className="absolute top-0 left-0 w-1 h-full bg-gold"></div>
 
-    <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-      <div>
-        <h3 className="text-xl font-serif text-white mb-1">
-          Live Market Rates
-        </h3>
-
-        <p className="text-xs text-gray-400">
-          {liveRates.loading
-            ? "Connecting to global market..."
-            : `Last updated at ${liveRates.lastUpdated} (Includes AP Import Premium)`}
-        </p>
-      </div>
-
-      <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-8 w-full md:w-auto">
-        <div className="text-center">
-          <div className="text-xs text-gold uppercase tracking-wider mb-1">
-            22K Gold (1g)
-          </div>
-
-          <div className="text-2xl font-semibold text-white font-sans">
-            {liveRates.loading
-              ? "₹ ---"
-              : `₹${liveRates.gold22k.toLocaleString("en-IN")}`}
-          </div>
-        </div>
-
-        <div className="w-px h-10 bg-white/10 hidden sm:block"></div>
-
-        <div className="text-center">
-          <div className="text-xs text-gold uppercase tracking-wider mb-1">
-            24K Gold (1g)
-          </div>
-
-          <div className="text-2xl font-semibold text-white font-sans">
-            {liveRates.loading
-              ? "₹ ---"
-              : `₹${liveRates.gold24k.toLocaleString("en-IN")}`}
-          </div>
-        </div>
-
-        <div className="w-px h-10 bg-white/10 hidden sm:block"></div>
-
-        <div className="text-center">
-          <div className="text-xs text-gray-400 uppercase tracking-wider mb-1">
-            Silver (1g)
-          </div>
-
-          <div className="text-2xl font-semibold text-white font-sans">
-            {liveRates.loading
-              ? "₹ ---"
-              : `₹${liveRates.silver.toLocaleString("en-IN")}`}
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>;
   useEffect(() => {
     let isMounted = true;
 
     setIsBestSellerLoading(true);
+    setIsCategoriesLoading(true);
 
     const loadHomeContent = async () => {
       const [
@@ -716,18 +627,21 @@ function App() {
         );
       }
 
+      // Load Categories from Supabase
       if (categoriesResult.status === "fulfilled") {
         setLandingCategories(
-          categoriesResult.value.map((category) =>
-            mapShopCategoryToHomeCategory(category),
-          ),
+          categoriesResult.value.map((category) => ({
+            id: category.id,
+            name: category.name,
+            slug: category.slug,
+            image: category.image || "/cat-rings.jpg",
+          }))
         );
       } else {
-        setLandingCategories(fallbackHomeCategories);
-        toast.error(
-          "Unable to load categories from Supabase. Showing local categories.",
-        );
+        setLandingCategories([]);
+        toast.error("Unable to load categories from Supabase.");
       }
+      setIsCategoriesLoading(false);
 
       if (bestSellerResult.status === "fulfilled") {
         setBestSellerProducts(bestSellerResult.value);
@@ -754,9 +668,9 @@ function App() {
       isMounted = false;
     };
   }, []);
+
   // Auto-scroll logic for Google Reviews carousel
   useEffect(() => {
-    // This is where isCarouselHovered is USED! It pauses the scroll.
     if (isCarouselHovered) return;
 
     const carousel = reviewCarouselRef.current;
@@ -781,7 +695,8 @@ function App() {
     }, 3500); // Slides every 3.5 seconds
 
     return () => clearInterval(scrollInterval);
-  }, [isCarouselHovered]); // React triggers this whenever hover state changes
+  }, [isCarouselHovered]);
+
   const toggleWishlist = (id: number) => {
     const isAdding = !wishlist.includes(id);
     const updated = toggleWishlistItem(id);
@@ -844,7 +759,7 @@ function App() {
       style: "currency",
       currency: "INR",
       maximumFractionDigits: 0,
-    }).format(price); // <--- Add .format(price) right here
+    }).format(price);
   };
 
   const cartProductIds = useMemo(() => {
@@ -892,6 +807,19 @@ function App() {
   const shouldScrollCollections = isMobile || landingCollections.length > 3;
   const shouldScrollCategories = isMobile || landingCategories.length > 4;
 
+  // NEW FEATURE: Detect products added in the last 1 hour
+  const recentProducts = useMemo(() => {
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).getTime();
+    return bestSellerProducts.filter((p: any) => {
+      const createdTime = p.created_at || p.createdAt;
+      if (!createdTime) return false;
+      return new Date(createdTime).getTime() > oneHourAgo;
+    });
+  }, [bestSellerProducts]);
+
+  const showRecent = recentProducts.length > 0;
+  const displayProducts = showRecent ? recentProducts : bestSellerProducts;
+
   return (
     <div className="min-h-screen bg-charcoal text-white overflow-x-hidden w-full relative">
       {" "}
@@ -899,7 +827,7 @@ function App() {
       <SeoHead />
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-charcoal/90 backdrop-blur-md border-b border-white/5">
-        {/* NEW: Static Live Market Rates Bar (Replaced the moving carousel) */}
+        {/* NEW: Static Live Market Rates Bar */}
         <div className="border-b border-gold/30 bg-charcoal-dark/95 py-1.5 px-2">
           <div className="flex flex-wrap items-center justify-center gap-x-4 sm:gap-x-8 gap-y-1 text-[10px] sm:text-xs tracking-wider md:tracking-widest uppercase font-medium">
             {liveRates.loading ? (
@@ -1067,9 +995,7 @@ function App() {
                     </button>
                     <button
                       type="button"
-                      onClick={() =>
-                        handleSectionNavigation("categories", true)
-                      }
+                      onClick={() => handleSectionNavigation("categories", true)}
                       className="text-lg hover:text-gold transition-colors text-left"
                     >
                       Categories
@@ -1131,6 +1057,7 @@ function App() {
           </div>
         </div>
       </nav>
+      
       {/* Hero Section */}
       <header
         ref={heroRef}
@@ -1195,6 +1122,7 @@ function App() {
           </div>
         </div>
       </header>
+      
       {/* Collection Section */}
       <section
         id="collections"
@@ -1386,6 +1314,7 @@ function App() {
           </div>
         </div>
       </section>
+      
       {/* Featured Section */}
       <section
         id="featured"
@@ -1454,7 +1383,8 @@ function App() {
           </div>
         </div>
       </section>
-      {/* Categories Section */}
+
+      {/* Categories Section - ADDED BACK IN! */}
       <section
         id="categories"
         ref={categoryRef}
@@ -1483,51 +1413,40 @@ function App() {
                 : "grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6"
             }
           >
-            {landingCategories.map((category) => (
-              <div
-                key={`${category.slug}-${category.id}`}
-                className={`category-card group cursor-pointer ${shouldScrollCategories ? "w-[200px] sm:w-[240px] md:w-[280px] shrink-0" : ""}`}
-              >
-                <div className="relative overflow-hidden mb-3 md:mb-4">
-                  <div className="aspect-square">
-                    <img
-                      src={category.image}
-                      alt={`${category.name} Collections - Nellore Gold Shop`}
-                      loading="lazy"
-                      onError={(event) => {
-                        const target = event.currentTarget;
-                        if (target.dataset.fallbackApplied === "true") {
-                          return;
-                        }
-                        target.dataset.fallbackApplied = "true";
-                        target.src =
-                          fallbackHomeCategories.find(
-                            (item) => item.slug === category.slug,
-                          )?.image || "/cat-rings.jpg";
-                      }}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                    />
-                  </div>
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                    <Link
-                      to={`/category/${category.slug}`}
-                      className="btn-luxury text-xs sm:text-sm"
-                    >
-                      Explore {category.name}
-                    </Link>
-                  </div>
-                </div>
-                <h3 className="font-serif text-lg sm:text-xl text-white text-center">
-                  {category.name}
-                </h3>
-                <p className="text-gray-400 text-xs sm:text-sm text-center">
-                  {category.count.toLocaleString()}{" "}
-                  {category.count === 1 ? "Product" : "Products"}
-                </p>
+            {isCategoriesLoading ? (
+              <div className="w-full col-span-4 text-gray-400 text-center py-8">
+                Loading categories...
               </div>
-            ))}
-
-            {landingCategories.length === 0 && (
+            ) : landingCategories.length > 0 ? (
+              landingCategories.map((category) => (
+                <div
+                  key={`${category.slug}-${category.id}`}
+                  className={`category-card group cursor-pointer ${shouldScrollCategories ? "w-[200px] sm:w-[240px] md:w-[280px] shrink-0" : ""}`}
+                >
+                  <div className="relative overflow-hidden mb-3 md:mb-4">
+                    <div className="aspect-square bg-charcoal-dark border border-white/10 rounded-sm">
+                      <img
+                        src={category.image}
+                        alt={`${category.name} Collections - Nellore Gold Shop`}
+                        loading="lazy"
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                      />
+                    </div>
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                      <Link
+                        to={`/category/${category.slug}`}
+                        className="btn-luxury text-xs sm:text-sm"
+                      >
+                        Explore {category.name}
+                      </Link>
+                    </div>
+                  </div>
+                  <h3 className="font-serif text-lg sm:text-xl text-white text-center">
+                    {category.name}
+                  </h3>
+                </div>
+              ))
+            ) : (
               <div
                 className={`${shouldScrollCategories ? "w-[260px] shrink-0" : "col-span-2 lg:col-span-4"} border border-white/10 bg-charcoal-light p-6 text-center text-gray-300 text-sm`}
               >
@@ -1537,6 +1456,7 @@ function App() {
           </div>
         </div>
       </section>
+
       {/* Products Section */}
       <section
         id="products"
@@ -1546,10 +1466,19 @@ function App() {
         <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 md:mb-12">
           <div>
             <span className="text-gold text-xs sm:text-sm tracking-widest uppercase mb-2 md:mb-4 block">
-              Nellore Favorites
+              {showRecent ? "Fresh Arrivals" : "Nellore Favorites"}
             </span>
             <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl text-white">
-              Best Sellers
+              {showRecent ? (
+                <>
+                  Recently Added
+                  <span className="text-sm font-sans text-gold ml-2 md:ml-4 border border-gold/50 rounded-full px-3 py-1 bg-gold/10 align-middle inline-block">
+                    Last Hour
+                  </span>
+                </>
+              ) : (
+                "Best Sellers"
+              )}
             </h2>
           </div>
           <Link
@@ -1577,14 +1506,25 @@ function App() {
                   </div>
                 </div>
               ))
-            ) : bestSellerProducts.length > 0 ? (
-              bestSellerProducts.map((product) => (
+            ) : displayProducts.length > 0 ? (
+              displayProducts.map((product) => (
                 <article
                   key={product.id}
                   className="product-card card-luxury group w-[240px] sm:w-[280px] md:w-[300px] shrink-0"
                 >
                   <div className="relative overflow-hidden">
-                    <div className="aspect-square">
+                    {/* MODIFIED: Clicking the image either navigates to the category (if recent) or opens Quick View */}
+                    <div 
+                      className="aspect-square cursor-pointer"
+                      onClick={() => {
+                        if (showRecent) {
+                          const slug = product.category?.toLowerCase().replace(/[^a-z0-9]+/g, '-') || 'rings';
+                          navigate(`/category/${slug}`);
+                        } else {
+                          openProductDialog(product);
+                        }
+                      }}
+                    >
                       <img
                         src={product.image}
                         alt={`${product.name} - Buy Gold Jewellery in Nellore`}
@@ -1593,19 +1533,19 @@ function App() {
                       />
                     </div>
                     {product.isNew && (
-                      <Badge className="absolute top-3 left-3 md:top-4 md:left-4 bg-gold text-charcoal text-[10px] md:text-xs">
+                      <Badge className="absolute top-3 left-3 md:top-4 md:left-4 bg-gold text-charcoal text-[10px] md:text-xs pointer-events-none">
                         New
                       </Badge>
                     )}
                     <button
                       onClick={() => toggleWishlist(product.id)}
-                      className="absolute top-3 right-3 md:top-4 md:right-4 p-2 bg-charcoal/80 rounded-full md:opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="absolute top-3 right-3 md:top-4 md:right-4 p-2 bg-charcoal/80 rounded-full md:opacity-0 group-hover:opacity-100 transition-opacity z-10"
                     >
                       <Heart
                         className={`w-4 h-4 md:w-5 md:h-5 ${wishlist.includes(product.id) ? "fill-gold text-gold" : "text-white"}`}
                       />
                     </button>
-                    <div className="absolute bottom-0 left-0 right-0 p-3 md:p-4 bg-gradient-to-t from-charcoal to-transparent md:opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="absolute bottom-0 left-0 right-0 p-3 md:p-4 bg-gradient-to-t from-charcoal to-transparent md:opacity-0 group-hover:opacity-100 transition-opacity z-10">
                       <div className="grid grid-cols-2 gap-2">
                         <button
                           onClick={() => openProductDialog(product)}
@@ -1651,12 +1591,13 @@ function App() {
               ))
             ) : (
               <div className="w-[240px] sm:w-[280px] md:w-[300px] shrink-0 border border-white/10 bg-charcoal px-4 py-8 sm:px-6 sm:py-10 text-center text-gray-300 text-sm">
-                Best sellers are not available right now.
+                Products are not available right now.
               </div>
             )}
           </div>
         </div>
       </section>
+      
       {/* Trust Section */}
       <section
         id="trust"
@@ -1753,6 +1694,7 @@ function App() {
           </div>
         </div>
       </section>
+      
       {/* Secure Delivery Partner Section */}
       <section className="py-12 md:py-16 border-t border-b border-white/10 bg-charcoal/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -1781,6 +1723,7 @@ function App() {
           </div>
         </div>
       </section>
+      
       {/* Our Story Section */}
       <section
         id="story"
@@ -1848,16 +1791,13 @@ function App() {
           </div>
         </div>
       </section>
-      {/* NEW: Comprehensive Local SEO Content & FAQ Section */}
+      
       {/* FULL SEO, REVIEWS, LIVE RATES, SOCIAL, AND FAQ SECTION */}
       <section
         ref={seoSectionRef}
         className="py-16 md:py-24 section-padding bg-charcoal-dark border-t border-white/5"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-gray-300">
-          {/* ========================================== */}
-          {/* NEW: Live Market Rates Banner              */}
-          {/* ========================================== */}
 
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-12 seo-content-block">
@@ -1926,7 +1866,7 @@ function App() {
               </div>
 
               <a
-                href="[https://www.google.com/search?q=shanti+jewellers+nellore](https://www.google.com/search?q=shanti+jewellers+nellore)"
+                href="https://www.google.com/search?q=shanti+jewellers+nellore"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="mt-3 text-gold hover:text-white transition-colors text-sm flex items-center gap-2"
@@ -1982,7 +1922,6 @@ function App() {
           </div>
 
           {/* ========================================== */}
-          {/* ========================================== */}
           {/* Social Media Section & Follower Counts     */}
           {/* ========================================== */}
           <div className="max-w-7xl mx-auto my-16 pt-10 border-t border-white/10">
@@ -2000,7 +1939,6 @@ function App() {
                 </p>
               </div>
 
-              {/* Centered the badges block neatly underneath the text */}
               <div className="flex flex-wrap justify-center gap-3 sm:gap-4">
                 <a
                   href="https://www.instagram.com/shanti_jewellery1960/?hl=en"
@@ -2100,6 +2038,7 @@ function App() {
           </div>
         </div>
       </section>
+      
       {/* CTA Section */}
       <section className="py-16 md:py-24 section-padding bg-gold/5">
         <div className="max-w-4xl mx-auto text-center px-4">
@@ -2130,6 +2069,7 @@ function App() {
           </div>
         </div>
       </section>
+      
       {/* Visit Us / Map Section */}
       <section
         id="visit"
@@ -2242,6 +2182,7 @@ function App() {
           </div>
         </div>
       </section>
+      
       {/* Footer */}
       <footer className="py-12 md:py-16 section-padding bg-charcoal-dark border-t border-white/5">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 md:gap-12 mb-10 md:mb-12">
@@ -2352,14 +2293,6 @@ function App() {
               </li>
               <li>
                 <a
-                  href="#categories"
-                  className="text-gray-400 hover:text-gold transition-colors text-xs md:text-sm"
-                >
-                  Categories
-                </a>
-              </li>
-              <li>
-                <a
                   href="#products"
                   className="text-gray-400 hover:text-gold transition-colors text-xs md:text-sm"
                 >
@@ -2460,6 +2393,7 @@ function App() {
           </div>
         </div>
       </footer>
+      
       {/* Product Dialog */}
       <Dialog open={isProductDialogOpen} onOpenChange={setIsProductDialogOpen}>
         <DialogContent className="bg-charcoal border-white/10 max-w-md md:max-w-4xl max-h-[90vh] overflow-y-auto mx-2 sm:mx-auto">
@@ -2532,6 +2466,7 @@ function App() {
           )}
         </DialogContent>
       </Dialog>
+      
       {/* WhatsApp Dialog */}
       <Dialog
         open={isWhatsAppDialogOpen}
@@ -2576,6 +2511,7 @@ function App() {
           </div>
         </DialogContent>
       </Dialog>
+      
       {/* Appointment Dialog */}
       <Dialog
         open={isAppointmentDialogOpen}
@@ -2643,6 +2579,7 @@ function App() {
           </div>
         </DialogContent>
       </Dialog>
+      
       {/* Floating WhatsApp Button */}
       <button
         type="button"
