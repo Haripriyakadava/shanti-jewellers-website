@@ -40,6 +40,7 @@ import { Badge } from "@/components/ui/badge";
 import { useCart } from "@/context/CartContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { collections as localLandingCollections } from "@/data/collections";
+import { products as localCatalogProducts } from "@/data/catalog";
 import {
   getShopStorageEventName,
   getWishlistIds,
@@ -242,6 +243,86 @@ const fallbackLandingCollections: ShopCollection[] =
     image: collection.image,
   }));
 
+const fallbackBestSellers: ShopProductCard[] = localCatalogProducts
+  .filter((p) => p.isBestSeller)
+  .map((p) => ({
+    id: p.id,
+    slug: p.name.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+    name: p.name,
+    category: p.category,
+    categorySlug: p.category.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+    collectionSlug: null,
+    price: p.price,
+    image: p.image,
+    hoverImage: p.hoverImage,
+    rating: p.rating,
+    isNew: p.isNew,
+    isBestSeller: p.isBestSeller,
+    engravable: p.engravable,
+    metal: p.metal,
+    createdAt: p.createdAt,
+    reviewsCount: 30 + p.id * 5,
+  }));
+
+const jewelleryTypes = [
+  {
+    id: 1,
+    name: "Rings",
+    image: "/cat-rings.jpg",
+    description: "Elegant solitaire, halo, and wedding bands crafted in gold and platinum.",
+    slug: "rings"
+  },
+  {
+    id: 2,
+    name: "Necklaces & Chokers",
+    image: "/cat-necklace.jpg",
+    description: "Stunning traditional harams, chokers, and modern statement neckpieces.",
+    slug: "necklaces"
+  },
+  {
+    id: 3,
+    name: "Earrings",
+    image: "/cat-earrings.jpg",
+    description: "Classic studs, traditional jhumkas, and contemporary drops.",
+    slug: "earrings"
+  },
+  {
+    id: 4,
+    name: "Bangles & Bracelets",
+    image: "/product-bangle.jpg",
+    description: "Exquisite hand-carved kadas and delicate charm bracelets.",
+    slug: "bangles"
+  },
+  {
+    id: 5,
+    name: "Bridal Sets",
+    image: "/product-bridal.jpg",
+    description: "Majestic heirloom collections designed for your special day.",
+    slug: "bridal-collection"
+  },
+  {
+    id: 6,
+    name: "Gold Chains",
+    image: "/product-chain.jpg",
+    description: "Durable, hand-woven rope, cuban, and classic gold chains.",
+    slug: "chains"
+  },
+  {
+    id: 7,
+    name: "Pendants",
+    image: "/cat-pendant.jpg",
+    description: "Delicate floral, lightweight, and modern daily-wear pendants.",
+    slug: "pendants"
+  },
+  {
+    id: 8,
+    name: "Diamond Studs",
+    image: "/product-studs.jpg",
+    description: "Brilliant round and princess-cut diamonds set in pure gold.",
+    slug: "studs"
+  }
+];
+
 const PRIORITY_COLLECTION_SLUGS = [
   "gold-classics",
   "bridal-collection",
@@ -268,7 +349,7 @@ function App() {
   const [isWhatsAppDialogOpen, setIsWhatsAppDialogOpen] = useState(false);
   const [isAppointmentDialogOpen, setIsAppointmentDialogOpen] = useState(false);
   const [wishlist, setWishlist] = useState<number[]>(() => getWishlistIds());
-  
+
   // Category State
   const [landingCategories, setLandingCategories] = useState<HomeCategory[]>([]);
   const [isCategoriesLoading, setIsCategoriesLoading] = useState(true);
@@ -643,11 +724,13 @@ function App() {
       }
       setIsCategoriesLoading(false);
 
-      if (bestSellerResult.status === "fulfilled") {
+      if (bestSellerResult.status === "fulfilled" && bestSellerResult.value.length > 0) {
         setBestSellerProducts(bestSellerResult.value);
       } else {
-        setBestSellerProducts([]);
-        toast.error("Unable to load best sellers from Supabase.");
+        setBestSellerProducts(fallbackBestSellers);
+        if (bestSellerResult.status === "rejected") {
+          toast.error("Unable to load best sellers from Supabase. Showing curated classics.");
+        }
       }
 
       if (
@@ -1057,7 +1140,7 @@ function App() {
           </div>
         </div>
       </nav>
-      
+
       {/* Hero Section */}
       <header
         ref={heroRef}
@@ -1122,7 +1205,7 @@ function App() {
           </div>
         </div>
       </header>
-      
+
       {/* Collection Section */}
       <section
         id="collections"
@@ -1175,12 +1258,11 @@ function App() {
                       src={collection.image}
                       alt={`${collection.name} - Shanti JEWELLERY Nellore`}
                       loading="lazy"
-                      className={`w-full h-full object-cover transform-gpu will-change-opacity transition-all duration-1000 ease-in-out group-hover:scale-110 ${
-                        (collection.slug === "bridal-collection" &&
-                          shouldPlayHeroVideo &&
-                          !hasBridalVideoError &&
-                          isBridalVideoReady &&
-                          hoveredCollection === "bridal-collection") ||
+                      className={`w-full h-full object-cover transform-gpu will-change-opacity transition-all duration-1000 ease-in-out group-hover:scale-110 ${(collection.slug === "bridal-collection" &&
+                        shouldPlayHeroVideo &&
+                        !hasBridalVideoError &&
+                        isBridalVideoReady &&
+                        hoveredCollection === "bridal-collection") ||
                         (collection.slug === "gold-classics" &&
                           shouldPlayHeroVideo &&
                           !hasGoldClassicsVideoError &&
@@ -1191,27 +1273,26 @@ function App() {
                           !hasEssentialsVideoError &&
                           isEssentialsVideoReady &&
                           hoveredCollection === "diamond-essentials")
-                          ? "opacity-0 pointer-events-none"
-                          : "opacity-100"
-                      } ${
-                        (collection.slug === "bridal-collection" &&
+                        ? "opacity-0 pointer-events-none"
+                        : "opacity-100"
+                        } ${(collection.slug === "bridal-collection" &&
                           shouldPlayHeroVideo &&
                           !hasBridalVideoError &&
                           !isBridalVideoReady &&
                           hoveredCollection === "bridal-collection") ||
-                        (collection.slug === "gold-classics" &&
-                          shouldPlayHeroVideo &&
-                          !hasGoldClassicsVideoError &&
-                          !isGoldClassicsVideoReady &&
-                          hoveredCollection === "gold-classics") ||
-                        (collection.slug === "diamond-essentials" &&
-                          shouldPlayHeroVideo &&
-                          !hasEssentialsVideoError &&
-                          !isEssentialsVideoReady &&
-                          hoveredCollection === "diamond-essentials")
+                          (collection.slug === "gold-classics" &&
+                            shouldPlayHeroVideo &&
+                            !hasGoldClassicsVideoError &&
+                            !isGoldClassicsVideoReady &&
+                            hoveredCollection === "gold-classics") ||
+                          (collection.slug === "diamond-essentials" &&
+                            shouldPlayHeroVideo &&
+                            !hasEssentialsVideoError &&
+                            !isEssentialsVideoReady &&
+                            hoveredCollection === "diamond-essentials")
                           ? "animate-pulse"
                           : ""
-                      }`}
+                        }`}
                     />
 
                     {collection.slug === "bridal-collection" &&
@@ -1230,9 +1311,8 @@ function App() {
                             setHasBridalVideoError(true);
                             setIsBridalVideoReady(false);
                           }}
-                          className={`absolute inset-0 w-full h-full object-cover transform-gpu will-change-opacity transition-all duration-1000 ease-in-out group-hover:scale-110 pointer-events-none ${
-                            isBridalVideoReady ? "opacity-100" : "opacity-0"
-                          }`}
+                          className={`absolute inset-0 w-full h-full object-cover transform-gpu will-change-opacity transition-all duration-1000 ease-in-out group-hover:scale-110 pointer-events-none ${isBridalVideoReady ? "opacity-100" : "opacity-0"
+                            }`}
                           aria-label="Bridal collection video preview"
                         >
                           <source src="/bridalvideo.mp4" type="video/mp4" />
@@ -1255,11 +1335,10 @@ function App() {
                             setHasGoldClassicsVideoError(true);
                             setIsGoldClassicsVideoReady(false);
                           }}
-                          className={`absolute inset-0 w-full h-full object-cover transform-gpu will-change-opacity transition-all duration-1000 ease-in-out group-hover:scale-110 pointer-events-none ${
-                            isGoldClassicsVideoReady
-                              ? "opacity-100"
-                              : "opacity-0"
-                          }`}
+                          className={`absolute inset-0 w-full h-full object-cover transform-gpu will-change-opacity transition-all duration-1000 ease-in-out group-hover:scale-110 pointer-events-none ${isGoldClassicsVideoReady
+                            ? "opacity-100"
+                            : "opacity-0"
+                            }`}
                           aria-label="Gold Classics collection video preview"
                         >
                           <source src="/clasicalvideo.mp4" type="video/mp4" />
@@ -1282,9 +1361,8 @@ function App() {
                             setHasEssentialsVideoError(true);
                             setIsEssentialsVideoReady(false);
                           }}
-                          className={`absolute inset-0 w-full h-full object-cover transform-gpu will-change-opacity transition-all duration-1000 ease-in-out group-hover:scale-110 pointer-events-none ${
-                            isEssentialsVideoReady ? "opacity-100" : "opacity-0"
-                          }`}
+                          className={`absolute inset-0 w-full h-full object-cover transform-gpu will-change-opacity transition-all duration-1000 ease-in-out group-hover:scale-110 pointer-events-none ${isEssentialsVideoReady ? "opacity-100" : "opacity-0"
+                            }`}
                           aria-label="Diamond Essentials collection video preview"
                         >
                           <source src="/diamondvideo.mp4" type="video/mp4" />
@@ -1314,7 +1392,7 @@ function App() {
           </div>
         </div>
       </section>
-      
+
       {/* Featured Section */}
       <section
         id="featured"
@@ -1466,138 +1544,61 @@ function App() {
         <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 md:mb-12">
           <div>
             <span className="text-gold text-xs sm:text-sm tracking-widest uppercase mb-2 md:mb-4 block">
-              {showRecent ? "Fresh Arrivals" : "Nellore Favorites"}
+              Our Exquisite Range
             </span>
             <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl text-white">
-              {showRecent ? (
-                <>
-                  Recently Added
-                  <span className="text-sm font-sans text-gold ml-2 md:ml-4 border border-gold/50 rounded-full px-3 py-1 bg-gold/10 align-middle inline-block">
-                    Last Hour
-                  </span>
-                </>
-              ) : (
-                "Best Sellers"
-              )}
+              Types of Jewellery Available
             </h2>
+            <p className="text-sm md:text-base text-gray-400 mt-3 max-w-2xl leading-relaxed">
+              Explore our diverse collections of handcrafted gold, diamond, and bridal ornaments. Tap to explore our designs.
+            </p>
           </div>
           <Link
             to="/category/rings"
             className="text-gold hover:text-gold-light transition-colors flex items-center gap-2 mt-4 sm:mt-0 text-sm md:text-base font-medium"
           >
-            View All Products
+            Explore All Categories
             <ArrowRight className="w-4 h-4 md:w-5 md:h-5" />
           </Link>
         </div>
 
         <div className="max-w-full overflow-x-auto overscroll-x-contain scrollbar-hide pb-4">
           <div className="flex min-w-max gap-4 sm:gap-6 pr-4 lg:pr-1">
-            {isBestSellerLoading ? (
-              Array.from({ length: 4 }).map((_, index) => (
-                <div
-                  key={`best-seller-skeleton-${index}`}
-                  className="product-card card-luxury overflow-hidden border border-white/10 bg-black/20 w-[240px] sm:w-[280px] md:w-[300px] shrink-0"
-                >
-                  <div className="aspect-square animate-pulse bg-white/5" />
-                  <div className="p-4 sm:p-6 space-y-3">
-                    <div className="h-3 w-24 animate-pulse bg-white/10" />
-                    <div className="h-5 w-3/4 animate-pulse bg-white/10" />
-                    <div className="h-4 w-20 animate-pulse bg-white/10" />
+            {jewelleryTypes.map((type) => (
+              <article
+                key={type.id}
+                className="product-card card-luxury group w-[240px] sm:w-[280px] md:w-[300px] shrink-0 border border-white/10 hover:border-gold/30 transition-colors bg-charcoal cursor-pointer"
+                onClick={() => navigate(`/category/${type.slug}`)}
+              >
+                <div className="relative overflow-hidden aspect-square">
+                  <img
+                    src={type.image}
+                    alt={`${type.name} - Jewellery in Nellore`}
+                    loading="lazy"
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-90 group-hover:opacity-100"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent pointer-events-none" />
+                  
+                  <div className="absolute inset-0 flex flex-col justify-end p-4 md:p-5 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <button className="w-full btn-primary-luxury text-[10px] md:text-xs lg:text-sm text-center px-1 py-2 md:px-2 md:py-3">
+                      Explore Collection
+                    </button>
                   </div>
                 </div>
-              ))
-            ) : displayProducts.length > 0 ? (
-              displayProducts.map((product) => (
-                <article
-                  key={product.id}
-                  className="product-card card-luxury group w-[240px] sm:w-[280px] md:w-[300px] shrink-0"
-                >
-                  <div className="relative overflow-hidden">
-                    {/* MODIFIED: Clicking the image either navigates to the category (if recent) or opens Quick View */}
-                    <div 
-                      className="aspect-square cursor-pointer"
-                      onClick={() => {
-                        if (showRecent) {
-                          const slug = product.category?.toLowerCase().replace(/[^a-z0-9]+/g, '-') || 'rings';
-                          navigate(`/category/${slug}`);
-                        } else {
-                          openProductDialog(product);
-                        }
-                      }}
-                    >
-                      <img
-                        src={product.image}
-                        alt={`${product.name} - Buy Gold Jewellery in Nellore`}
-                        loading="lazy"
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                      />
-                    </div>
-                    {product.isNew && (
-                      <Badge className="absolute top-3 left-3 md:top-4 md:left-4 bg-gold text-charcoal text-[10px] md:text-xs pointer-events-none">
-                        New
-                      </Badge>
-                    )}
-                    <button
-                      onClick={() => toggleWishlist(product.id)}
-                      className="absolute top-3 right-3 md:top-4 md:right-4 p-2 bg-charcoal/80 rounded-full md:opacity-0 group-hover:opacity-100 transition-opacity z-10"
-                    >
-                      <Heart
-                        className={`w-4 h-4 md:w-5 md:h-5 ${wishlist.includes(product.id) ? "fill-gold text-gold" : "text-white"}`}
-                      />
-                    </button>
-                    <div className="absolute bottom-0 left-0 right-0 p-3 md:p-4 bg-gradient-to-t from-charcoal to-transparent md:opacity-0 group-hover:opacity-100 transition-opacity z-10">
-                      <div className="grid grid-cols-2 gap-2">
-                        <button
-                          onClick={() => openProductDialog(product)}
-                          className="w-full btn-primary-luxury text-[10px] md:text-xs lg:text-sm text-center px-1 py-2 md:px-2 md:py-3"
-                        >
-                          Quick View
-                        </button>
-                        <button
-                          onClick={() => {
-                            if (cartProductIds.has(product.id)) {
-                              navigate("/cart");
-                              return;
-                            }
-                            addProductToCart(product);
-                          }}
-                          className={`w-full border border-gold transition-colors text-[10px] md:text-xs lg:text-sm px-1 py-2 md:px-2 md:py-3 ${
-                            cartProductIds.has(product.id)
-                              ? "bg-gold text-charcoal hover:bg-gold-light"
-                              : "text-gold hover:bg-gold hover:text-charcoal"
-                          }`}
-                        >
-                          {cartProductIds.has(product.id)
-                            ? "View Cart"
-                            : "Add Cart"}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="p-4 sm:p-6">
-                    <span className="text-gray-400 text-[10px] sm:text-xs tracking-widest uppercase">
-                      {product.category}
-                    </span>
-                    <h3 className="font-serif text-base sm:text-lg text-white mt-1 mb-2 truncate">
-                      {product.name}
-                    </h3>
-                    <div className="flex items-center justify-between">
-                      <span className="text-gold font-medium text-sm sm:text-base">
-                        {formatPrice(product.price)}
-                      </span>
-                    </div>
-                  </div>
-                </article>
-              ))
-            ) : (
-              <div className="w-[240px] sm:w-[280px] md:w-[300px] shrink-0 border border-white/10 bg-charcoal px-4 py-8 sm:px-6 sm:py-10 text-center text-gray-300 text-sm">
-                Products are not available right now.
-              </div>
-            )}
+                <div className="p-4 sm:p-5 md:p-6 text-center">
+                  <h3 className="font-serif text-lg sm:text-xl text-gold mb-2">
+                    {type.name}
+                  </h3>
+                  <p className="text-gray-400 text-[10px] sm:text-xs md:text-sm leading-relaxed">
+                    {type.description}
+                  </p>
+                </div>
+              </article>
+            ))}
           </div>
         </div>
       </section>
-      
+
       {/* Trust Section */}
       <section
         id="trust"
@@ -1694,7 +1695,7 @@ function App() {
           </div>
         </div>
       </section>
-      
+
       {/* Secure Delivery Partner Section */}
       <section className="py-12 md:py-16 border-t border-b border-white/10 bg-charcoal/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -1723,7 +1724,7 @@ function App() {
           </div>
         </div>
       </section>
-      
+
       {/* Our Story Section */}
       <section
         id="story"
@@ -1791,7 +1792,7 @@ function App() {
           </div>
         </div>
       </section>
-      
+
       {/* FULL SEO, REVIEWS, LIVE RATES, SOCIAL, AND FAQ SECTION */}
       <section
         ref={seoSectionRef}
@@ -2038,7 +2039,7 @@ function App() {
           </div>
         </div>
       </section>
-      
+
       {/* CTA Section */}
       <section className="py-16 md:py-24 section-padding bg-gold/5">
         <div className="max-w-4xl mx-auto text-center px-4">
@@ -2069,7 +2070,7 @@ function App() {
           </div>
         </div>
       </section>
-      
+
       {/* Visit Us / Map Section */}
       <section
         id="visit"
@@ -2182,7 +2183,7 @@ function App() {
           </div>
         </div>
       </section>
-      
+
       {/* Footer */}
       <footer className="py-12 md:py-16 section-padding bg-charcoal-dark border-t border-white/5">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 md:gap-12 mb-10 md:mb-12">
@@ -2393,7 +2394,7 @@ function App() {
           </div>
         </div>
       </footer>
-      
+
       {/* Product Dialog */}
       <Dialog open={isProductDialogOpen} onOpenChange={setIsProductDialogOpen}>
         <DialogContent className="bg-charcoal border-white/10 max-w-md md:max-w-4xl max-h-[90vh] overflow-y-auto mx-2 sm:mx-auto">
@@ -2466,7 +2467,7 @@ function App() {
           )}
         </DialogContent>
       </Dialog>
-      
+
       {/* WhatsApp Dialog */}
       <Dialog
         open={isWhatsAppDialogOpen}
@@ -2511,7 +2512,7 @@ function App() {
           </div>
         </DialogContent>
       </Dialog>
-      
+
       {/* Appointment Dialog */}
       <Dialog
         open={isAppointmentDialogOpen}
@@ -2579,7 +2580,7 @@ function App() {
           </div>
         </DialogContent>
       </Dialog>
-      
+
       {/* Floating WhatsApp Button */}
       <button
         type="button"
