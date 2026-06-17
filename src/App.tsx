@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { toast } from "sonner";
@@ -36,20 +36,17 @@ import {
 } from "@/components/ui/dialog";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+
 import { useCart } from "@/context/CartContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { collections as localLandingCollections } from "@/data/collections";
-import { products as localCatalogProducts } from "@/data/catalog";
 import {
   getShopStorageEventName,
   getWishlistIds,
-  toggleWishlistItem,
 } from "@/lib/shop-storage";
 import {
   fetchAllCategories,
   fetchAllCollections,
-  fetchBestSellerProducts,
   fetchMetalPriceTicker,
   type ShopProductCard,
   type ShopCollection,
@@ -243,83 +240,78 @@ const fallbackLandingCollections: ShopCollection[] =
     image: collection.image,
   }));
 
-const fallbackBestSellers: ShopProductCard[] = localCatalogProducts
-  .filter((p) => p.isBestSeller)
-  .map((p) => ({
-    id: p.id,
-    slug: p.name.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
-    name: p.name,
-    category: p.category,
-    categorySlug: p.category.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
-    collectionSlug: null,
-    price: p.price,
-    image: p.image,
-    hoverImage: p.hoverImage,
-    rating: p.rating,
-    isNew: p.isNew,
-    isBestSeller: p.isBestSeller,
-    engravable: p.engravable,
-    metal: p.metal,
-    createdAt: p.createdAt,
-    reviewsCount: 30 + p.id * 5,
-  }));
-
 const jewelleryTypes = [
   {
     id: 1,
-    name: "Rings",
-    image: "/cat-rings.jpg",
-    description: "Elegant solitaire, halo, and wedding bands crafted in gold and platinum.",
-    slug: "rings"
+    name: "Gold Jewellery",
+    image: "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?auto=format&fit=crop&q=80&w=600",
+    description: "Pure and radiant 22K & 24K gold ornaments for every occasion.",
   },
   {
     id: 2,
-    name: "Necklaces & Chokers",
-    image: "/cat-necklace.jpg",
-    description: "Stunning traditional harams, chokers, and modern statement neckpieces.",
-    slug: "necklaces"
+    name: "Diamond Jewellery",
+    image: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&q=80&w=600",
+    description: "Brilliant IGI certified diamonds set in exquisite designs.",
   },
   {
     id: 3,
-    name: "Earrings",
-    image: "/cat-earrings.jpg",
-    description: "Classic studs, traditional jhumkas, and contemporary drops.",
-    slug: "earrings"
+    name: "Silver Jewellery",
+    image: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&q=80&w=600",
+    description: "Elegant and contemporary silver pieces for daily wear.",
   },
   {
     id: 4,
-    name: "Bangles & Bracelets",
-    image: "/product-bangle.jpg",
-    description: "Exquisite hand-carved kadas and delicate charm bracelets.",
-    slug: "bangles"
+    name: "Platinum Jewellery",
+    image: "https://images.unsplash.com/photo-1601121141461-9d6647bca1ed?auto=format&fit=crop&q=80&w=600",
+    description: "Rare and timeless platinum bands and delicate chains.",
   },
   {
     id: 5,
-    name: "Bridal Sets",
-    image: "/product-bridal.jpg",
+    name: "Bridal Jewellery",
+    image: "https://images.unsplash.com/photo-1543294001-f7cd5d7fb516?auto=format&fit=crop&q=80&w=600",
     description: "Majestic heirloom collections designed for your special day.",
-    slug: "bridal-collection"
   },
   {
     id: 6,
-    name: "Gold Chains",
-    image: "/product-chain.jpg",
-    description: "Durable, hand-woven rope, cuban, and classic gold chains.",
-    slug: "chains"
+    name: "Rings",
+    image: "https://images.unsplash.com/photo-1605100804763-247f67b3557e?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    description: "Elegant solitaire, halo, and classic wedding bands.",
   },
   {
     id: 7,
-    name: "Pendants",
-    image: "/cat-pendant.jpg",
-    description: "Delicate floral, lightweight, and modern daily-wear pendants.",
-    slug: "pendants"
+    name: "Earrings",
+    image: "https://images.unsplash.com/photo-1535632787350-4e68ef0ac584?auto=format&fit=crop&q=80&w=600",
+    description: "Classic studs, traditional jhumkas, and contemporary drops.",
   },
   {
     id: 8,
-    name: "Diamond Studs",
-    image: "/product-studs.jpg",
-    description: "Brilliant round and princess-cut diamonds set in pure gold.",
-    slug: "studs"
+    name: "Necklaces",
+    image: "https://images.unsplash.com/photo-1685970731194-e27b477e87ba?q=80&w=688&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    description: "Stunning traditional harams and modern statement neckpieces.",
+  },
+  {
+    id: 9,
+    name: "Chains",
+    image: "https://images.unsplash.com/photo-1708220040856-131e4f86a1aa?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    description: "Durable, hand-woven rope, cuban, and classic chains.",
+  },
+  {
+    id: 10,
+    name: "Pendants",
+    image: "https://images.unsplash.com/photo-1531995811006-35cb42e1a022?auto=format&fit=crop&q=80&w=600",
+    description: "Delicate floral, lightweight, and modern daily-wear pendants.",
+  },
+  {
+    id: 11,
+    name: "Bangles",
+    image: "https://images.unsplash.com/photo-1679156271456-d6068c543ee7?q=80&w=711&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    description: "Exquisite hand-carved kadas and traditional bangles.",
+  },
+  {
+    id: 12,
+    name: "Bracelets",
+    image: "https://images.unsplash.com/photo-1689367436629-1d288f1e23b6?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    description: "Delicate charm bracelets and modern luxury wrist-wear.",
   }
 ];
 
@@ -339,11 +331,10 @@ type HomeCategory = {
 };
 
 function App() {
-  const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const { totalItems, addToCart, cartItems } = useCart();
+  const { totalItems } = useCart();
   const [isNavOpen, setIsNavOpen] = useState(false);
-  const [selectedProduct, setSelectedProduct] =
+  const [selectedProduct] =
     useState<ShopProductCard | null>(null);
   const [isProductDialogOpen, setIsProductDialogOpen] = useState(false);
   const [isWhatsAppDialogOpen, setIsWhatsAppDialogOpen] = useState(false);
@@ -369,10 +360,7 @@ function App() {
   const [landingCollections, setLandingCollections] = useState<
     ShopCollection[]
   >(fallbackLandingCollections);
-  const [bestSellerProducts, setBestSellerProducts] = useState<
-    ShopProductCard[]
-  >([]);
-  const [isBestSellerLoading, setIsBestSellerLoading] = useState(true);
+
   const [goldPriceTicker, setGoldPriceTicker] = useState<
     ShopMetalPriceTickerItem[]
   >(fallbackGoldPriceTicker);
@@ -679,19 +667,16 @@ function App() {
   useEffect(() => {
     let isMounted = true;
 
-    setIsBestSellerLoading(true);
     setIsCategoriesLoading(true);
 
     const loadHomeContent = async () => {
       const [
         collectionsResult,
         categoriesResult,
-        bestSellerResult,
         goldPricesResult,
       ] = await Promise.allSettled([
         fetchAllCollections(),
         fetchAllCategories(),
-        fetchBestSellerProducts(12),
         fetchMetalPriceTicker(),
       ]);
 
@@ -724,15 +709,6 @@ function App() {
       }
       setIsCategoriesLoading(false);
 
-      if (bestSellerResult.status === "fulfilled" && bestSellerResult.value.length > 0) {
-        setBestSellerProducts(bestSellerResult.value);
-      } else {
-        setBestSellerProducts(fallbackBestSellers);
-        if (bestSellerResult.status === "rejected") {
-          toast.error("Unable to load best sellers from Supabase. Showing curated classics.");
-        }
-      }
-
       if (
         goldPricesResult.status === "fulfilled" &&
         goldPricesResult.value.length > 0
@@ -741,8 +717,6 @@ function App() {
       } else {
         setGoldPriceTicker(fallbackGoldPriceTicker);
       }
-
-      setIsBestSellerLoading(false);
     };
 
     void loadHomeContent();
@@ -780,40 +754,6 @@ function App() {
     return () => clearInterval(scrollInterval);
   }, [isCarouselHovered]);
 
-  const toggleWishlist = (id: number) => {
-    const isAdding = !wishlist.includes(id);
-    const updated = toggleWishlistItem(id);
-    setWishlist(updated);
-
-    if (isAdding) {
-      const productName =
-        bestSellerProducts.find((item) => item.id === id)?.name ?? "Product";
-      toast.success(`${productName} added to wishlist.`);
-    }
-  };
-
-  const addProductToCart = (product: ShopProductCard) => {
-    addToCart({
-      productId: product.id,
-      name: product.name,
-      image: product.image,
-      unitPrice: product.price,
-      quantity: 1,
-      selection: {
-        metal: product.metal,
-        carat: 3,
-        diamondType: product.metal === "Diamond" ? "Natural" : "Lab-Grown",
-        size: "N/A",
-      },
-    });
-    toast.success(`${product.name} added to cart.`);
-  };
-
-  const openProductDialog = (product: ShopProductCard) => {
-    setSelectedProduct(product);
-    setIsProductDialogOpen(true);
-  };
-
   const scrollToSection = (sectionId: string) => {
     const section = document.getElementById(sectionId);
     if (!section) {
@@ -844,10 +784,6 @@ function App() {
       maximumFractionDigits: 0,
     }).format(price);
   };
-
-  const cartProductIds = useMemo(() => {
-    return new Set(cartItems.map((item) => item.productId));
-  }, [cartItems]);
 
   const orderedCollections = useMemo(() => {
     const prioritized: ShopCollection[] = [];
@@ -889,19 +825,6 @@ function App() {
 
   const shouldScrollCollections = isMobile || landingCollections.length > 3;
   const shouldScrollCategories = isMobile || landingCategories.length > 4;
-
-  // NEW FEATURE: Detect products added in the last 1 hour
-  const recentProducts = useMemo(() => {
-    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).getTime();
-    return bestSellerProducts.filter((p: any) => {
-      const createdTime = p.created_at || p.createdAt;
-      if (!createdTime) return false;
-      return new Date(createdTime).getTime() > oneHourAgo;
-    });
-  }, [bestSellerProducts]);
-
-  const showRecent = recentProducts.length > 0;
-  const displayProducts = showRecent ? recentProducts : bestSellerProducts;
 
   return (
     <div className="min-h-screen bg-charcoal text-white overflow-x-hidden w-full relative">
@@ -1510,7 +1433,7 @@ function App() {
                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                       />
                     </div>
-                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                    <div className="absolute inset-0  opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
                       <Link
                         to={`/category/${category.slug}`}
                         className="btn-luxury text-xs sm:text-sm"
@@ -1535,11 +1458,11 @@ function App() {
         </div>
       </section>
 
-      {/* Products Section */}
+      {/* Products Section (Continuous Carousel) */}
       <section
         id="products"
         ref={productsRef}
-        className="py-16 md:py-24 section-padding bg-charcoal-light"
+        className="py-16 md:py-24 section-padding bg-charcoal-light overflow-hidden"
       >
         <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 md:mb-12">
           <div>
@@ -1553,48 +1476,86 @@ function App() {
               Explore our diverse collections of handcrafted gold, diamond, and bridal ornaments. Tap to explore our designs.
             </p>
           </div>
-          <Link
-            to="/category/rings"
-            className="text-gold hover:text-gold-light transition-colors flex items-center gap-2 mt-4 sm:mt-0 text-sm md:text-base font-medium"
-          >
-            Explore All Categories
-            <ArrowRight className="w-4 h-4 md:w-5 md:h-5" />
-          </Link>
         </div>
 
-        <div className="max-w-full overflow-x-auto overscroll-x-contain scrollbar-hide pb-4">
-          <div className="flex min-w-max gap-4 sm:gap-6 pr-4 lg:pr-1">
-            {jewelleryTypes.map((type) => (
-              <article
-                key={type.id}
-                className="product-card card-luxury group w-[240px] sm:w-[280px] md:w-[300px] shrink-0 border border-white/10 hover:border-gold/30 transition-colors bg-charcoal cursor-pointer"
-                onClick={() => navigate(`/category/${type.slug}`)}
-              >
-                <div className="relative overflow-hidden aspect-square">
-                  <img
-                    src={type.image}
-                    alt={`${type.name} - Jewellery in Nellore`}
-                    loading="lazy"
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-90 group-hover:opacity-100"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent pointer-events-none" />
-                  
-                  <div className="absolute inset-0 flex flex-col justify-end p-4 md:p-5 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <button className="w-full btn-primary-luxury text-[10px] md:text-xs lg:text-sm text-center px-1 py-2 md:px-2 md:py-3">
-                      Explore Collection
-                    </button>
+        {/* CSS for Continuous Infinite Marquee */}
+        <style>
+          {`
+            @keyframes marquee-scroll {
+              0% { transform: translateX(0); }
+              100% { transform: translateX(-50%); }
+            }
+            .animate-marquee-infinite {
+              display: flex;
+              width: max-content;
+              animation: marquee-scroll 45s linear infinite;
+            }
+            .animate-marquee-infinite:hover {
+              animation-play-state: paused;
+            }
+          `}
+        </style>
+
+        <div className="relative w-full pb-4">
+          {/* Optional: Add gradient edges to make the text fade out smoothly at the sides */}
+        
+          {/* Marquee Track */}
+          <div className="animate-marquee-infinite">
+            {/* First Set of Items */}
+            <div className="flex gap-4 sm:gap-6 pr-4 sm:pr-6">
+              {jewelleryTypes.map((type) => (
+                <article
+                  key={type.id}
+                  className="product-card card-luxury group w-[240px] sm:w-[280px] md:w-[300px] shrink-0 border border-white/10 hover:border-gold/30 transition-colors bg-charcoal"
+                >
+                  <div className="relative overflow-hidden aspect-square">
+                    <img
+                      src={type.image}
+                      alt={`${type.name} - Jewellery in Nellore`}
+                      loading="lazy"
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-90 group-hover:opacity-100"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent pointer-events-none" />
                   </div>
-                </div>
-                <div className="p-4 sm:p-5 md:p-6 text-center">
-                  <h3 className="font-serif text-lg sm:text-xl text-gold mb-2">
-                    {type.name}
-                  </h3>
-                  <p className="text-gray-400 text-[10px] sm:text-xs md:text-sm leading-relaxed">
-                    {type.description}
-                  </p>
-                </div>
-              </article>
-            ))}
+                  <div className="p-4 sm:p-5 md:p-6 text-center">
+                    <h3 className="font-serif text-lg sm:text-xl text-gold mb-2">
+                      {type.name}
+                    </h3>
+                    <p className="text-gray-400 text-[10px] sm:text-xs md:text-sm leading-relaxed">
+                      {type.description}
+                    </p>
+                  </div>
+                </article>
+              ))}
+            </div>
+
+            {/* Second Set of Items (Duplicate for seamless looping) */}
+            <div className="flex gap-4 sm:gap-6 pr-4 sm:pr-6" aria-hidden="true">
+              {jewelleryTypes.map((type) => (
+                <article
+                  key={`dup-${type.id}`}
+                  className="product-card card-luxury group w-[240px] sm:w-[280px] md:w-[300px] shrink-0 border border-white/10 hover:border-gold/30 transition-colors bg-charcoal"
+                >
+                  <div className="relative overflow-hidden aspect-square">
+                    <img
+                      src={type.image}
+                      alt={`${type.name} - Jewellery in Nellore`}
+                      loading="lazy"
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-90 group-hover:opacity-100"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent pointer-events-none" />
+                  </div>
+                  <div className="p-4 sm:p-5 md:p-6 text-center">
+                    <h3 className="font-serif text-lg sm:text-xl text-gold mb-2">
+                      {type.name}
+                    </h3>
+                    <p className="text-gray-400 text-[10px] sm:text-xs md:text-sm leading-relaxed">
+                      {type.description}
+                    </p>
+                  </div>
+                </article>
+              ))}
+            </div>
           </div>
         </div>
       </section>
