@@ -154,11 +154,17 @@ function ProductPage() {
 
     return [
       { label: 'Category', value: product.category || 'N/A' },
-      { label: 'Price', value: formatPrice(price) },
-      { label: 'Making Charge', value: detailMap.get('making charge') || 'N/A' },
+      // { label: 'Price', value: formatPrice(price) },
+      // { label: 'Making Charge', value: detailMap.get('making charge') || 'N/A' },
       { label: 'Metal Type', value: selectedMetal || product.metalOptions[0] || detailMap.get('metal type') || 'N/A' },
-      { label: 'Weight', value: detailMap.get('weight') || 'N/A' },
-      { label: 'Purity', value: detailMap.get('purity') || 'N/A' },
+      { label: 'Gross Weight', value: product.grossWeight ? `${product.grossWeight}g` : 'N/A' },
+      { label: 'Stone Weight', value: product.stoneWeight ? `${product.stoneWeight}g` : 'N/A' },
+      { label: 'Net Weight', value: product.netWeight ? `${product.netWeight}g` : 'N/A' },
+      { label: 'Gold Amount', value: product.amountWithoutStones ? formatPrice(product.amountWithoutStones) : 'N/A' },
+      { label: 'Stone Amount', value: product.stoneAmount ? formatPrice(product.stoneAmount) : 'N/A' },
+      { label: 'Total Gold Value', value: product.amountWithoutGst ? formatPrice(product.amountWithoutGst) : 'N/A' },
+      { label: `GST (${product.gstPercentage || 0}%)`, value: product.gstAmount ? formatPrice(product.gstAmount) : 'N/A' },
+      { label: 'Total Price', value: product.basePrice ? formatPrice(product.basePrice) : 'N/A' },
       {
         label: 'Collection',
         value:
@@ -174,10 +180,10 @@ function ProductPage() {
 
   const canAddToCart = Boolean(
     product
-      && !isAddingToCart
-      && (!requiresMetal || selectedMetal)
-      && (!requiresCarat || selectedCarat > 0)
-      && (!requiresDiamondType || selectedDiamondType),
+    && !isAddingToCart
+    && (!requiresMetal || selectedMetal)
+    && (!requiresCarat || selectedCarat > 0)
+    && (!requiresDiamondType || selectedDiamondType),
   );
 
   const isProductInCart = useMemo(() => {
@@ -425,9 +431,8 @@ function ProductPage() {
                           key={index}
                           type="button"
                           onClick={() => setActiveImageIndex(index)}
-                          className={`h-1.5 rounded-full transition-all ${
-                            activeImageIndex === index ? 'w-8 bg-gold' : 'w-3 bg-white/25'
-                          }`}
+                          className={`h-1.5 rounded-full transition-all ${activeImageIndex === index ? 'w-8 bg-gold' : 'w-3 bg-white/25'
+                            }`}
                         />
                       ))}
                     </div>
@@ -450,9 +455,8 @@ function ProductPage() {
                           key={`${image}-${index}`}
                           type="button"
                           onClick={() => setActiveImageIndex(index)}
-                          className={`aspect-square bg-[#111] border overflow-hidden flex items-center justify-center transition-colors ${
-                            activeImageIndex === index ? 'border-gold' : 'border-white/10 hover:border-gold/60'
-                          }`}
+                          className={`aspect-square bg-[#111] border overflow-hidden flex items-center justify-center transition-colors ${activeImageIndex === index ? 'border-gold' : 'border-white/10 hover:border-gold/60'
+                            }`}
                         >
                           <img
                             src={image}

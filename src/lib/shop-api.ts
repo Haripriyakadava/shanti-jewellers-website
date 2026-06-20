@@ -42,6 +42,15 @@ type ProductRow = {
   created_at: string;
   category_id: number;
   collection_id: number | null;
+  // Database fields for GST and Stones
+  stone_amount?: number | null;
+  amount_without_stones?: number | null;
+  gst_percentage?: number | null;
+  amount_without_gst?: number | null;
+  gst_amount?: number | null;
+  total_amount?: number | null;
+  net_weight?: number | null;
+  gross_weight?: number | null;
 };
 
 type ProductImageRow = {
@@ -95,6 +104,11 @@ export type ShopProductCard = {
   categorySlug: string;
   collectionSlug: string | null;
   price: number;
+  basePrice: number;
+  originalPrice: number;
+  gstPercentage: number;
+  stoneAmount: number;
+  amountWithoutStones: number;
   image: string;
   hoverImage: string;
   rating: number;
@@ -104,6 +118,9 @@ export type ShopProductCard = {
   metal: string;
   createdAt: string;
   reviewsCount: number;
+  netWeight: number;
+  grossWeight: number;
+  stoneWeight: number;
 };
 
 export type ShopCollectionProduct = {
@@ -111,12 +128,20 @@ export type ShopCollectionProduct = {
   name: string;
   price: string;
   priceValue: number;
+  basePrice: number;
+  originalPrice: number;
+  gstPercentage: number;
+  stoneAmount: number;
+  amountWithoutStones: number;
   image: string;
   hoverImage: string;
   badges: string[];
   rating: number;
   reviews: number;
   collectionSlug: string;
+  netWeight: number;
+  grossWeight: number;
+  stoneWeight: number;
 };
 
 export type ShopProductDetail = {
@@ -130,6 +155,13 @@ export type ShopProductDetail = {
   description: string;
   longDescription: string;
   price: number;
+  basePrice: number;
+  originalPrice: number;
+  stoneAmount: number;
+  amountWithoutStones: number;
+  gstPercentage: number;
+  amountWithoutGst: number;
+  gstAmount: number;
   image: string;
   hoverImage: string;
   gallery: string[];
@@ -143,6 +175,9 @@ export type ShopProductDetail = {
   diamondOptions: string[];
   ringSizes: string[];
   unavailableRingSizes: string[];
+  netWeight: number;
+  grossWeight: number;
+  stoneWeight: number;
 };
 
 export type ShopMetalPriceTickerItem = {
@@ -185,6 +220,8 @@ const categoryFallbackImages = [
   '/featured-main.jpg',
   '/featured-detail.jpg',
 ];
+
+const SELECT_PRODUCT_COLUMNS = 'id, name, slug, sku, base_price, original_price, image_url, hover_image_url, description, long_description, rating, is_new, is_best_seller, is_engravable, stock_quantity, created_at, category_id, collection_id, stone_amount, amount_without_stones, gst_percentage, amount_without_gst, gst_amount, total_amount, net_weight, gross_weight';
 
 function hashSeed(value: string): number {
   let hash = 0;
@@ -254,12 +291,11 @@ function toPriceNumber(value: number | string | null | undefined): number {
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
-function getDisplayPrice(row: Pick<ProductRow, 'base_price' | 'original_price'>): number {
-  const originalPrice = toPriceNumber(row.original_price);
-  if (originalPrice > 0) {
-    return originalPrice;
+function getDisplayPrice(row: Pick<ProductRow, 'base_price' | 'original_price' | 'total_amount'>): number {
+  const totalAmount = toPriceNumber(row.total_amount);
+  if (totalAmount > 0) {
+    return totalAmount;
   }
-
   return toPriceNumber(row.base_price);
 }
 
@@ -422,6 +458,11 @@ function mapProductCard(
     categorySlug: category.slug,
     collectionSlug,
     price: getDisplayPrice(row),
+    basePrice: toPriceNumber(row.total_amount) > 0 ? toPriceNumber(row.total_amount) : toPriceNumber(row.base_price),
+    originalPrice: toPriceNumber(row.original_price),
+    gstPercentage: toPriceNumber(row.gst_percentage) || 3.0,
+    stoneAmount: toPriceNumber(row.stone_amount),
+    amountWithoutStones: toPriceNumber(row.base_price),
     image: images.image,
     hoverImage: images.hoverImage,
     rating: asIntRating(row.rating),
@@ -431,6 +472,9 @@ function mapProductCard(
     metal: primaryMetal,
     createdAt: row.created_at,
     reviewsCount,
+    netWeight: Number(toPriceNumber(row.net_weight).toFixed(3)),
+    grossWeight: Number(toPriceNumber(row.gross_weight).toFixed(3)),
+    stoneWeight: Number(Math.max(0, toPriceNumber(row.gross_weight) - toPriceNumber(row.net_weight)).toFixed(3)),
   };
 }
 
@@ -694,7 +738,7 @@ export async function fetchProductsByCategorySlug(slug: string): Promise<{ categ
 
   const { data, error } = await supabase
     .from('products')
-    .select('id, name, slug, sku, base_price, original_price, image_url, hover_image_url, description, long_description, rating, is_new, is_best_seller, is_engravable, stock_quantity, created_at, category_id, collection_id')
+    .select(SELECT_PRODUCT_COLUMNS)
     .eq('tenant_id', tenantId)
     .eq('category_id', category.id)
     .eq('is_active', true)
@@ -718,7 +762,7 @@ export async function fetchBestSellerProducts(limit = 12): Promise<ShopProductCa
 
   const { data, error } = await supabase
     .from('products')
-    .select('id, name, slug, sku, base_price, original_price, image_url, hover_image_url, description, long_description, rating, is_new, is_best_seller, is_engravable, stock_quantity, created_at, category_id, collection_id')
+    .select(SELECT_PRODUCT_COLUMNS)
     .eq('tenant_id', tenantId)
     .eq('is_active', true)
     .eq('is_best_seller', true)
@@ -794,7 +838,7 @@ export async function fetchProductsByCollectionSlug(slug: string): Promise<{ col
 
   const { data, error } = await supabase
     .from('products')
-    .select('id, name, slug, sku, base_price, original_price, image_url, hover_image_url, description, long_description, rating, is_new, is_best_seller, is_engravable, stock_quantity, created_at, category_id, collection_id')
+    .select(SELECT_PRODUCT_COLUMNS)
     .eq('tenant_id', tenantId)
     .eq('collection_id', collection.id)
     .eq('is_active', true)
@@ -838,12 +882,20 @@ export async function fetchProductsByCollectionSlug(slug: string): Promise<{ col
         maximumFractionDigits: 0,
       }).format(displayPrice),
       priceValue: displayPrice,
+      basePrice: toPriceNumber(row.total_amount) > 0 ? toPriceNumber(row.total_amount) : toPriceNumber(row.base_price),
+      originalPrice: toPriceNumber(row.original_price),
+      gstPercentage: toPriceNumber(row.gst_percentage) || 3.0,
+      stoneAmount: toPriceNumber(row.stone_amount),
+      amountWithoutStones: toPriceNumber(row.base_price),
       image: images.image,
       hoverImage: images.hoverImage,
       badges,
       rating: asIntRating(row.rating),
       reviews: reviewCounts.get(row.id) ?? 0,
       collectionSlug: collection.slug,
+      netWeight: Number(toPriceNumber(row.net_weight).toFixed(3)),
+      grossWeight: Number(toPriceNumber(row.gross_weight).toFixed(3)),
+      stoneWeight: Number(Math.max(0, toPriceNumber(row.gross_weight) - toPriceNumber(row.net_weight)).toFixed(3)),
     };
   });
 
@@ -858,7 +910,7 @@ export async function fetchProductDetailById(productId: number): Promise<ShopPro
 
   const { data, error } = await supabase
     .from('products')
-    .select('id, name, slug, sku, base_price, original_price, image_url, hover_image_url, description, long_description, rating, is_new, is_best_seller, is_engravable, stock_quantity, created_at, category_id, collection_id')
+    .select(SELECT_PRODUCT_COLUMNS)
     .eq('tenant_id', tenantId)
     .eq('id', productId)
     .eq('is_active', true)
@@ -988,6 +1040,13 @@ export async function fetchProductDetailById(productId: number): Promise<ShopPro
     description: row.description ?? '',
     longDescription: row.long_description ?? row.description ?? '',
     price: getDisplayPrice(row),
+    basePrice: toPriceNumber(row.total_amount) > 0 ? toPriceNumber(row.total_amount) : toPriceNumber(row.base_price),
+    originalPrice: toPriceNumber(row.original_price),
+    stoneAmount: toPriceNumber(row.stone_amount),
+    amountWithoutStones: toPriceNumber(row.base_price),
+    gstPercentage: toPriceNumber(row.gst_percentage) || 3.0,
+    amountWithoutGst: toPriceNumber(row.amount_without_gst),
+    gstAmount: toPriceNumber(row.gst_amount),
     image: resolvedImages.image,
     hoverImage: resolvedImages.hoverImage,
     gallery,
@@ -1001,6 +1060,9 @@ export async function fetchProductDetailById(productId: number): Promise<ShopPro
     diamondOptions,
     ringSizes: availableSizes,
     unavailableRingSizes: unavailableSizes,
+    netWeight: Number(toPriceNumber(row.net_weight).toFixed(3)),
+    grossWeight: Number(toPriceNumber(row.gross_weight).toFixed(3)),
+    stoneWeight: Number(Math.max(0, toPriceNumber(row.gross_weight) - toPriceNumber(row.net_weight)).toFixed(3)),
   };
 }
 
@@ -1016,7 +1078,7 @@ export async function searchProducts(query: string, limit = 24): Promise<ShopPro
 
   const { data, error } = await supabase
     .from('products')
-    .select('id, name, slug, sku, base_price, original_price, image_url, hover_image_url, description, long_description, rating, is_new, is_best_seller, is_engravable, stock_quantity, created_at, category_id, collection_id')
+    .select(SELECT_PRODUCT_COLUMNS)
     .eq('tenant_id', tenantId)
     .eq('is_active', true)
     .or(`name.ilike.${pattern},slug.ilike.${pattern},sku.ilike.${pattern},description.ilike.${pattern}`)
@@ -1043,7 +1105,7 @@ export async function fetchProductsByIds(productIds: number[]): Promise<ShopProd
 
   const { data, error } = await supabase
     .from('products')
-    .select('id, name, slug, sku, base_price, original_price, image_url, hover_image_url, description, long_description, rating, is_new, is_best_seller, is_engravable, stock_quantity, created_at, category_id, collection_id')
+    .select(SELECT_PRODUCT_COLUMNS)
     .eq('tenant_id', tenantId)
     .in('id', uniqueIds)
     .eq('is_active', true);

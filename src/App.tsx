@@ -833,43 +833,7 @@ function App() {
       <SeoHead />
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-charcoal/90 backdrop-blur-md border-b border-white/5">
-        {/* NEW: Static Live Market Rates Bar */}
-        <div className="border-b border-gold/30 bg-charcoal-dark/95 py-1.5 px-2">
-          <div className="flex flex-wrap items-center justify-center gap-x-4 sm:gap-x-8 gap-y-1 text-[10px] sm:text-xs tracking-wider md:tracking-widest uppercase font-medium">
-            {liveRates.loading ? (
-              <span className="text-gold/80 animate-pulse">
-                Connecting to live market...
-              </span>
-            ) : (
-              <>
-                <div className="flex items-center gap-2 text-gold">
-                  <span>22K Gold:</span>
-                  <span className="font-bold">
-                    ₹{liveRates.gold22k.toLocaleString("en-IN")} /g
-                  </span>
-                </div>
 
-                <span className="hidden sm:block text-white/20">|</span>
-
-                <div className="flex items-center gap-2 text-gold/90">
-                  <span>24K Gold:</span>
-                  <span className="font-bold">
-                    ₹{liveRates.gold24k.toLocaleString("en-IN")} /g
-                  </span>
-                </div>
-
-                <span className="hidden md:block text-white/20">|</span>
-
-                <div className="flex items-center gap-2 text-gray-300">
-                  <span>Silver:</span>
-                  <span className="font-bold">
-                    ₹{liveRates.silver.toLocaleString("en-IN")} /g
-                  </span>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
 
         <div className="section-padding">
           <div className="flex items-center justify-between h-16 sm:h-20">
@@ -1498,7 +1462,7 @@ function App() {
 
         <div className="relative w-full pb-4">
           {/* Optional: Add gradient edges to make the text fade out smoothly at the sides */}
-        
+
           {/* Marquee Track */}
           <div className="animate-marquee-infinite">
             {/* First Set of Items */}
