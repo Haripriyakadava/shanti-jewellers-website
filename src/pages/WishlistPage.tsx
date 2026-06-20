@@ -89,6 +89,14 @@ function WishlistPage() {
               createdAt: localProduct.createdAt,
               reviewsCount: 0,
               href: `/category/${toCategorySlug(localProduct.category)}`,
+              basePrice: localProduct.price,
+              originalPrice: localProduct.price,
+              gstPercentage: 3.0,
+              stoneAmount: 0,
+              amountWithoutStones: localProduct.price,
+              netWeight: 0,
+              grossWeight: 0,
+              stoneWeight: 0,
             } satisfies WishlistProduct;
           })
           .filter((item): item is WishlistProduct => Boolean(item));

@@ -394,7 +394,7 @@ function App() {
   const [isCarouselHovered, setIsCarouselHovered] = useState(false);
 
   // Live Market Rates State
-  const [liveRates, setLiveRates] = useState({
+  const [_liveRates, _setLiveRates] = useState({
     gold24k: 0,
     gold22k: 0,
     silver: 0,
@@ -637,7 +637,7 @@ function App() {
           (silverInr / TROY_OUNCE_IN_GRAMS) * INDIAN_PREMIUM,
         );
 
-        setLiveRates({
+        _setLiveRates({
           gold24k,
           gold22k,
           silver,
@@ -650,7 +650,7 @@ function App() {
       } catch (error) {
         console.error("Failed to fetch live metal rates:", error);
 
-        setLiveRates((prev) => ({
+        _setLiveRates((prev: any) => ({
           ...prev,
           loading: false,
         }));
