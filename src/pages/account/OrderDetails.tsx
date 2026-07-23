@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { DashboardLayout } from '@/layouts/DashboardLayout';
-import { Loader2, Package, MapPin, CreditCard, ChevronLeft, Download, ExternalLink, Home, Phone, Mail } from 'lucide-react';
+import { Loader2, Package, CreditCard, ChevronLeft, Download, ExternalLink, Home, Phone, Mail } from 'lucide-react';
 import { useAuth } from '@/auth/AuthContext';
-import { orderService, type Order, type OrderItem } from '@/services/order.service';
+import { orderService, type Order } from '@/services/order.service';
 import { formatPrice } from '@/lib/utils';
-import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 
 export default function OrderDetails() {

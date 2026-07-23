@@ -5,6 +5,8 @@ export type ShopMetalPriceTickerItem = {
   metal: string;
   purity: string;
   pricePerGram: number;
+  price?: number;
+  unit?: string;
   trend: 'up' | 'down' | 'neutral';
   lastUpdated: string;
 };
@@ -14,6 +16,7 @@ export type ShopCollection = {
   name: string;
   slug: string;
   description: string | null;
+  subtitle?: string | null;
   image: string;
   createdAt: string;
   displayOrder: number;
@@ -46,6 +49,8 @@ export type ShopProductCard = {
   metal: string;
   createdAt: string;
   reviewsCount: number;
+  badges?: string[];
+  reviews?: any[];
 };
 
 export type ShopCollectionProduct = ShopProductCard;
@@ -219,7 +224,13 @@ export async function fetchProductDetailById(productId: string | number): Promis
       ],
       // Compatibility with old payload
       categoryName: p.category?.name,
-      categorySlug: p.category?.slug
+      categorySlug: p.category?.slug,
+      metalOptions: p.variants?.map((v: any) => v.attributes?.metal).filter(Boolean).length > 0 ? Array.from(new Set(p.variants.map((v: any) => v.attributes?.metal))) : [p.metalType || 'Gold'],
+      caratOptions: p.variants?.map((v: any) => v.attributes?.carat).filter(Boolean).length > 0 ? Array.from(new Set(p.variants.map((v: any) => v.attributes?.carat))) : [p.grossWeight || 0],
+      diamondOptions: p.variants?.map((v: any) => v.attributes?.diamond).filter(Boolean).length > 0 ? Array.from(new Set(p.variants.map((v: any) => v.attributes?.diamond))) : ['Natural'],
+      gallery: p.images?.map((img: any) => img.imageUrl) || [p.imageUrl || 'https://images.unsplash.com/photo-1599643478524-fb66f70362f6'],
+      image: p.imageUrl || (p.images?.[0]?.imageUrl) || 'https://images.unsplash.com/photo-1599643478524-fb66f70362f6',
+      hoverImage: p.hoverImageUrl || null
     };
   } catch (e) {
     return null;

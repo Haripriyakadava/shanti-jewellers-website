@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { AdminLayout } from '@/layouts/AdminLayout';
-import { Loader2, Package, MapPin, ChevronLeft, Truck, CheckCircle2, History, AlertCircle } from 'lucide-react';
+import { Loader2, MapPin, ChevronLeft, Truck, CheckCircle2, History, AlertCircle } from 'lucide-react';
 import { orderService, type Order, type OrderItem } from '@/services/order.service';
 import { formatPrice } from '@/lib/utils';
 import { toast } from 'sonner';

@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { User, ShoppingBag, Heart, MapPin, Key, LogOut, Star, LayoutDashboard } from 'lucide-react';
+import { User, ShoppingBag, Heart, MapPin, LogOut, Star } from 'lucide-react';
 import { useAuth } from '../auth/AuthContext';
 import { SeoHead } from '../components/SeoHead';
 import { Navbar } from '../components/Navbar';

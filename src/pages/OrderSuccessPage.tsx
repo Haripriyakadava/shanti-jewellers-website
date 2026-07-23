@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { useSearchParams, useNavigate, Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { CheckCircle, ShoppingBag, FileText, Truck, ArrowRight, User, MapPin, Calendar, CreditCard } from 'lucide-react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import { motion, type Variants } from 'framer-motion';
+import { CheckCircle, ShoppingBag, FileText, Truck, User, MapPin, CreditCard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getItem, StorageKeys } from '@/auth/storage';
 import { getCurrentTenantId } from '@/lib/tenant';
@@ -102,7 +102,7 @@ export default function OrderSuccessPage() {
     }
   };
 
-  const itemVariants = {
+  const itemVariants: Variants = {
     hidden: { opacity: 0, y: 20 },
     show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } }
   };

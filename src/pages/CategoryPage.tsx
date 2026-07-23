@@ -39,7 +39,7 @@ function CategoryPage() {
   const [activeCategory, setActiveCategory] = useState<ShopCategory | null>(null);
   const [allCategories, setAllCategories] = useState<ShopCategory[]>([]);
   const [products, setProducts] = useState<ShopProductCard[]>([]);
-  const [wishlist, setWishlist] = useState<number[]>(() => getWishlistIds());
+  const [wishlist, setWishlist] = useState<(string | number)[]>(() => getWishlistIds());
   const [isLoading, setIsLoading] = useState(true);
 
   const [engravableOnly, setEngravableOnly] = useState(false);
@@ -155,7 +155,7 @@ function CategoryPage() {
     }).format(price);
   };
 
-  const toggleWishlist = async (id: number) => { const nextWishlist = await toggleWishlistItem(id); setWishlist(nextWishlist); };
+  const toggleWishlist = async (id: string | number) => { const nextWishlist = await toggleWishlistItem(id); setWishlist(nextWishlist); };
 
   const toggleMetal = (metal: string) => {
     setSelectedMetals((previous) =>
@@ -356,7 +356,7 @@ function CategoryPage() {
                         className="w-full h-full object-cover transition-all duration-700 group-hover:scale-105 group-hover:opacity-0"
                       />
                       <img
-                        src={product.hoverImage}
+                        src={product.hoverImage ?? undefined}
                         alt={`${product.name} alternate view`}
                         loading="lazy"
                         decoding="async"

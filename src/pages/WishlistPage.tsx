@@ -19,7 +19,7 @@ function formatPrice(value: number) {
 }
 
 function WishlistPage() {
-  const [wishlistIds, setWishlistIds] = useState<number[]>(() => getWishlistIds());
+  const [wishlistIds, setWishlistIds] = useState<(string | number)[]>(() => getWishlistIds());
   const [wishlistProducts, setWishlistProducts] = useState<WishlistProduct[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -74,15 +74,7 @@ function WishlistPage() {
                 metal: p.metaltype || p.metal || 'Gold',
                 createdAt: p.created_at || p.createdAt || new Date().toISOString(),
                 reviewsCount: 0,
-                href: `/product/${p.id}`,
-                basePrice: Number(p.base_price || p.basePrice || p.price || 0),
-                originalPrice: Number(p.original_price || p.originalPrice || p.price || 0),
-                gstPercentage: Number(p.gst_percentage || p.gstPercentage || 3),
-                stoneAmount: Number(p.stone_amount || p.stoneAmount || 0),
-                amountWithoutStones: Number(p.amount_without_stones || p.amountWithoutStones || 0),
-                netWeight: Number(p.net_weight || p.netWeight || 0),
-                grossWeight: Number(p.gross_weight || p.grossWeight || 0),
-                stoneWeight: Number(p.stone_weight || p.stoneWeight || 0),
+                href: `/product/${p.id}`
               } satisfies WishlistProduct;
             });
             
@@ -119,7 +111,7 @@ function WishlistPage() {
     };
   }, [wishlistIds]);
 
-  const removeItem = (id: number) => {
+  const removeItem = (id: string | number) => {
     setWishlistIds(removeWishlistItem(id));
   };
 

@@ -184,7 +184,7 @@ function SearchPage() {
 											className="w-full h-full object-cover transition-all duration-700 group-hover:scale-105 group-hover:opacity-0"
 										/>
 										<img
-											src={product.hoverImage}
+											src={product.hoverImage ?? undefined}
 											alt={`${product.name} alternate view`}
 											loading="lazy"
 											decoding="async"

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronDown, ChevronUp, CreditCard, Landmark, Smartphone, Home, Banknote } from 'lucide-react';
+import { ChevronDown, ChevronUp, CreditCard, Home, Banknote } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';

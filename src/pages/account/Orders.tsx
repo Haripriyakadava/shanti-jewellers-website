@@ -1,22 +1,16 @@
 import { useEffect, useState } from 'react';
 import { DashboardLayout } from '@/layouts/DashboardLayout';
-import { Eye, Package, Loader2, Search, Filter } from 'lucide-react';
+import { Package, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { orderService, type Order } from '@/services/order.service';
-import { formatPrice } from '@/lib/utils';
 import { toast } from 'sonner';
 
 export default function Orders() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('All');
-
-  const filterOptions = [
-    'All', 'Pending', 'Confirmed', 'Preparing', 'Packed', 'Shipped', 
-    'Out for Delivery', 'Delivered', 'Cancelled', 'Returned'
-  ];
+  const [searchTerm] = useState('');
+  const [statusFilter] = useState('All');
 
   useEffect(() => {
     const fetchOrders = async () => {

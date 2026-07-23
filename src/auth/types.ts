@@ -12,6 +12,7 @@ export interface User {
   pan_number?: string;
   marital_status?: 'Single' | 'Married';
   created_at: string;
+  role?: string;
 }
 
 export interface Address {

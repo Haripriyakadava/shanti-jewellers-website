@@ -62,19 +62,19 @@ function writeJSON<T>(key: string, value: T) {
 }
 
 export function getWishlistIds() {
-  return readJSON<number[]>(scopedStorageKey(WISHLIST_KEY), []);
+  return readJSON<(string | number)[]>(scopedStorageKey(WISHLIST_KEY), []);
 }
 
-export function setWishlistIds(ids: number[]) {
+export function setWishlistIds(ids: (string | number)[]) {
   writeJSON(scopedStorageKey(WISHLIST_KEY), ids);
   emitUpdate();
 }
 
-export function isInWishlist(id: number) {
+export function isInWishlist(id: string | number) {
   return getWishlistIds().includes(id);
 }
 
-function syncWishlistWithBackend(id: number, isAdding: boolean) {
+function syncWishlistWithBackend(id: string | number, isAdding: boolean) {
   if (typeof window !== 'undefined' && getItem(StorageKeys.ACCESS_TOKEN)) {
     if (isAdding) {
       wishlistService.addProduct(id).catch(() => {});
@@ -84,7 +84,7 @@ function syncWishlistWithBackend(id: number, isAdding: boolean) {
   }
 }
 
-export function toggleWishlistItem(id: number) {
+export function toggleWishlistItem(id: string | number) {
   const wishlist = getWishlistIds();
   const isAdding = !wishlist.includes(id);
   const updated = isAdding
@@ -96,7 +96,7 @@ export function toggleWishlistItem(id: number) {
   return updated;
 }
 
-export function removeWishlistItem(id: number) {
+export function removeWishlistItem(id: string | number) {
   const wishlist = getWishlistIds();
   const updated = wishlist.filter((itemId) => itemId !== id);
   writeJSON(scopedStorageKey(WISHLIST_KEY), updated);
@@ -106,7 +106,7 @@ export function removeWishlistItem(id: number) {
 
 export function clearWishlist() {
   writeJSON(scopedStorageKey(WISHLIST_KEY), []);
-  return [] as number[];
+  return [] as (string | number)[];
 }
 
 export function getCartItems() {

@@ -54,15 +54,7 @@ export default function Wishlist() {
             metal: p.metaltype || p.metal || 'Gold',
             createdAt: p.created_at || p.createdAt || new Date().toISOString(),
             reviewsCount: 0,
-            href: `/product/${p.id}`,
-            basePrice: Number(p.base_price || p.basePrice || p.price || 0),
-            originalPrice: Number(p.original_price || p.originalPrice || p.price || 0),
-            gstPercentage: Number(p.gst_percentage || p.gstPercentage || 3),
-            stoneAmount: Number(p.stone_amount || p.stoneAmount || 0),
-            amountWithoutStones: Number(p.amount_without_stones || p.amountWithoutStones || 0),
-            netWeight: Number(p.net_weight || p.netWeight || 0),
-            grossWeight: Number(p.gross_weight || p.grossWeight || 0),
-            stoneWeight: Number(p.stone_weight || p.stoneWeight || 0),
+            href: `/product/${p.id}`
           } satisfies WishlistProduct;
         });
 
@@ -94,7 +86,7 @@ export default function Wishlist() {
     };
   }, []);
 
-  const removeFromWishlist = async (id: number) => {
+  const removeFromWishlist = async (id: string | number) => {
     await removeWishlistItem(id);
     // State is instantly updated via storage event listener triggering reload
     // but we can also manually remove it for snappy UI

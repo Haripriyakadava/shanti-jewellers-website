@@ -35,7 +35,7 @@ function ProductDetailPage() {
   const [selectedMetal, setSelectedMetal] = useState('');
   const [selectedCaratWeight, setSelectedCaratWeight] = useState('');
   const [selectedDiamondType, setSelectedDiamondType] = useState('');
-  const [wishlistIds, setWishlistIds] = useState<number[]>(() => getWishlistIds());
+  const [wishlistIds, setWishlistIds] = useState<(string | number)[]>(() => getWishlistIds());
   const [cartMessage, setCartMessage] = useState('');
 
   useEffect(() => {
@@ -134,9 +134,9 @@ function ProductDetailPage() {
 
       normalized
         .split('|')
-        .map((token) => token.trim())
+        .map((token: string) => token.trim())
         .filter(Boolean)
-        .forEach((line) => {
+        .forEach((line: string) => {
           const splitIndex = line.indexOf(':');
           if (splitIndex <= 0) {
             return;
@@ -241,7 +241,7 @@ function ProductDetailPage() {
     }
   };
 
-  const handleToggleWishlist = (itemId: number) => {
+  const handleToggleWishlist = (itemId: string | number) => {
     const isAdding = !wishlistIds.includes(itemId);
     const nextIds = toggleWishlistItem(itemId);
     setWishlistIds(nextIds);
@@ -466,13 +466,13 @@ function ProductDetailPage() {
                     className="absolute inset-0 w-full h-full object-cover transition-all duration-500 opacity-100 group-hover:opacity-0 group-hover:scale-105"
                   />
                   <img
-                    src={item.hoverImage}
+                    src={item.hoverImage ?? undefined}
                     alt={`${item.name} worn by model`}
                     className="absolute inset-0 w-full h-full object-cover transition-all duration-500 opacity-0 group-hover:opacity-100 group-hover:scale-105"
                   />
                   <button
                     type="button"
-                    onClick={(event) => {
+                    onClick={(event: React.MouseEvent) => {
                       event.preventDefault();
                       event.stopPropagation();
                       handleToggleWishlist(item.id);

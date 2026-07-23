@@ -316,7 +316,7 @@ const PRIORITY_COLLECTION_SLUGS = [
 const fallbackGoldPriceTicker: ShopMetalPriceTickerItem[] = [];
 
 type HomeCategory = {
-  id: number;
+  id: string | number;
   name: string;
   slug: string;
   image: string;
@@ -332,7 +332,7 @@ function App() {
   const [isProductDialogOpen, setIsProductDialogOpen] = useState(false);
   const [isWhatsAppDialogOpen, setIsWhatsAppDialogOpen] = useState(false);
   const [isAppointmentDialogOpen, setIsAppointmentDialogOpen] = useState(false);
-  const [localWishlist, setLocalWishlist] = useState<number[]>(() => getWishlistIds());
+  const [localWishlist, setLocalWishlist] = useState<(string | number)[]>(() => getWishlistIds());
   const [dbWishlistCount, setDbWishlistCount] = useState<number | null>(null);
 
   // Category State
@@ -851,7 +851,7 @@ function App() {
     });
 
     return goldPriceTicker.map((item) => {
-      const value = formatter.format(item.price);
+      const value = formatter.format(item.price ?? 0);
       return `${item.metal}: ${value} / ${item.unit}`;
     });
   }, [goldPriceTicker]);

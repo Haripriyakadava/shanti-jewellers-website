@@ -139,9 +139,9 @@ function ProductPage() {
 
       normalized
         .split('|')
-        .map((token) => token.trim())
+        .map((token: string) => token.trim())
         .filter(Boolean)
-        .forEach((line) => {
+        .forEach((line: string) => {
           const splitIndex = line.indexOf(':');
           if (splitIndex <= 0) {
             return;
@@ -416,7 +416,7 @@ function ProductPage() {
                         }
                       }}
                     >
-                      {product.gallery.map((image, index) => (
+                      {product.gallery.map((image: string, index: number) => (
                         <div key={`${image}-${index}`} className="min-w-full snap-center">
                           <div className="aspect-[4/5] max-h-[62vh] bg-[#111] border border-white/10 overflow-hidden flex items-center justify-center">
                             <img
@@ -432,7 +432,7 @@ function ProductPage() {
                     </div>
 
                     <div className="flex justify-center gap-2">
-                      {product.gallery.map((_, index) => (
+                      {product.gallery.map((_: string, index: number) => (
                         <button
                           key={index}
                           type="button"
@@ -456,7 +456,7 @@ function ProductPage() {
                     </div>
 
                     <div className="grid grid-cols-4 gap-3">
-                      {product.gallery.map((image, index) => (
+                      {product.gallery.map((image: string, index: number) => (
                         <button
                           key={`${image}-${index}`}
                           type="button"
@@ -532,7 +532,7 @@ function ProductPage() {
                     </p>
                     {product.metalOptions.length > 1 ? (
                       <div className="flex flex-wrap gap-2">
-                        {product.metalOptions.map((option) => (
+                        {product.metalOptions.map((option: string) => (
                           <button
                             key={option}
                             type="button"

@@ -58,9 +58,10 @@ function detectPriceBand(priceValue: number) {
   return 'Above $4,000';
 }
 
-function inferAudience(id: number): Audience {
+function inferAudience(id: string | number): Audience {
   const map: Audience[] = ['Women', 'Men', 'Unisex'];
-  return map[id % 3];
+  const numericId = typeof id === 'number' ? id : 0;
+  return map[numericId % 3];
 }
 
 function CollectionPage() {
@@ -84,7 +85,7 @@ function CollectionPage() {
     onSale: false,
     engravable: false,
   });
-  const [wishlistIds, setWishlistIds] = useState<number[]>(() => getWishlistIds());
+  const [wishlistIds, setWishlistIds] = useState<(string | number)[]>(() => getWishlistIds());
   const [cartMessage, setCartMessage] = useState('');
 
   useEffect(() => {
@@ -126,7 +127,7 @@ function CollectionPage() {
       const priceValue = product.priceValue || parsePriceValue(product.price);
       const style = detectStyle(product.name);
       const metal = detectMetal(product.name);
-      const diamondType = product.badges.includes('Lab Grown') ? 'Lab Grown' : 'Natural';
+      const diamondType = (product.badges || []).includes('Lab Grown') ? 'Lab Grown' : 'Natural';
       return {
         ...product,
         style,
@@ -135,9 +136,9 @@ function CollectionPage() {
         priceBand: detectPriceBand(priceValue),
         audience: inferAudience(product.id),
         plainMetal: !product.name.toLowerCase().includes('diamond'),
-        onSale: product.badges.includes('On Sale') || product.id % 5 === 0,
+        onSale: (product.badges || []).includes('On Sale') || (typeof product.id === 'number' ? product.id : 0) % 5 === 0,
         engravable: style === 'Ring' || style === 'Pendant',
-        score: product.rating * 100 + product.reviews,
+        score: product.rating * 100 + product.reviewsCount,
       };
     });
   }, [collectionProducts]);
@@ -171,7 +172,7 @@ function CollectionPage() {
     (Object.keys(selectedFilters) as FilterKey[]).some((key) => selectedFilters[key].length > 0);
 
   const cartProductIds = useMemo(() => {
-    return new Set(cartItems.map((item) => item.productId));
+    return new Set<string | number>(cartItems.map((item) => item.productId));
   }, [cartItems]);
 
   if (!isLoading && !collection) {
@@ -206,7 +207,7 @@ function CollectionPage() {
     setActiveFilter(null);
   };
 
-  const toggleProductWishlist = (productId: number) => {
+  const toggleProductWishlist = (productId: string | number) => {
     const isAdding = !wishlistIds.includes(productId);
     const nextIds = toggleWishlistItem(productId);
     setWishlistIds(nextIds);
@@ -217,13 +218,7 @@ function CollectionPage() {
     }
   };
 
-  const addCollectionProductToCart = async (product: {
-    id: number;
-    name: string;
-    price: string;
-    image: string;
-    badges: string[];
-  }) => {
+  const addCollectionProductToCart = async (product: any) => {
     const numericPrice = Number(product.price.replace(/[^0-9.]/g, ''));
     try {
       await addToCart({
@@ -417,12 +412,12 @@ function CollectionPage() {
               <Link to={`/collections/${slug}/product/${product.id}`} className="block">
                 <div className="relative aspect-[4/4.2] bg-black/30 overflow-hidden">
                   <img
-                    src={product.image}
+                    src={product.image || ''}
                     alt={product.name}
                     className="absolute inset-0 w-full h-full object-cover transition-all duration-500 opacity-100 group-hover:opacity-0 group-hover:scale-105"
                   />
                   <img
-                    src={product.hoverImage}
+                    src={product.hoverImage ?? undefined}
                     alt={`${product.name} worn by model`}
                     className="absolute inset-0 w-full h-full object-cover transition-all duration-500 opacity-0 group-hover:opacity-100 group-hover:scale-105"
                   />
@@ -451,7 +446,7 @@ function CollectionPage() {
                   </div>
 
                   <div className="mt-2.5 flex flex-wrap gap-1.5">
-                    {product.badges.map((badge) => (
+                    {(product.badges || []).map((badge: string) => (
                       <span
                         key={`${product.id}-${badge}`}
                         className="text-[11px] px-2 py-0.5 border border-white/20 bg-charcoal-light text-gray-200"

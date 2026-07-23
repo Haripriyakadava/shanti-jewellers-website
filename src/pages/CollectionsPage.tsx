@@ -13,6 +13,8 @@ const fallbackCollections: ShopCollection[] = localCollections.map((collection, 
   subtitle: collection.subtitle,
   description: collection.description,
   image: collection.image,
+  createdAt: new Date().toISOString(),
+  displayOrder: index
 }));
 
 function CollectionsPage() {
