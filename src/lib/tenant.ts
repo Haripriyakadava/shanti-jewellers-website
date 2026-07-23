@@ -1,4 +1,3 @@
-import { supabase } from '@/lib/supabase';
 
 type TenantRow = Record<string, unknown>;
 
@@ -111,16 +110,14 @@ async function resolveTenant(): Promise<TenantIdentity> {
   const hostSlugCandidate = getSlugCandidateFromHost(primaryHost);
   const envSlug = asNonEmptyString(import.meta.env.VITE_TENANT_SLUG)?.toLowerCase() ?? null;
 
-  const { data, error } = await supabase
-    .from('tenants')
-    .select('*')
-    .order('created_at', { ascending: true, nullsFirst: true })
-    .limit(500);
-
-  if (error) {
-    throw error;
+  // We cannot use fetchApi here because it depends on getCurrentTenantId()
+  const API_BASE_URL = 'http://localhost:5000/api';
+  const response = await fetch(`${API_BASE_URL}/tenant`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch tenants from backend');
   }
-
+  
+  const { data } = await response.json();
   const tenants = (data ?? []) as TenantRow[];
 
   if (tenants.length === 0) {

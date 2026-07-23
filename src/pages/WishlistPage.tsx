@@ -3,8 +3,9 @@ import { ArrowLeft, Heart, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 
+import { authService } from '@/auth/authService';
+import { wishlistService } from '@/services/wishlist.service';
 import { clearWishlist, getShopStorageEventName, getWishlistIds, removeWishlistItem } from '../lib/shop-storage';
-import { products as localProducts, toCategorySlug } from '@/data/catalog';
 import { fetchProductsByIds, type ShopProductCard } from '@/lib/shop-api';
 
 type WishlistProduct = ShopProductCard & { href: string };
@@ -39,7 +40,9 @@ function WishlistPage() {
     let isMounted = true;
 
     const loadWishlistProducts = async () => {
-      if (wishlistIds.length === 0) {
+      const isAuthenticated = authService.isAuthenticated();
+
+      if (!isAuthenticated && wishlistIds.length === 0) {
         setWishlistProducts([]);
         setIsLoading(false);
         return;
@@ -48,67 +51,60 @@ function WishlistPage() {
       setIsLoading(true);
 
       try {
-        const payload = await fetchProductsByIds(wishlistIds);
-        if (!isMounted) {
-          return;
-        }
-
-        const supabaseById = new Map(payload.map((item) => [item.id, item]));
-        const localById = new Map(localProducts.map((item) => [item.id, item]));
-
-        const resolved = wishlistIds
-          .map((id) => {
-            const supabaseProduct = supabaseById.get(id);
-            if (supabaseProduct) {
+        if (isAuthenticated) {
+          const backendItems = await wishlistService.getWishlist();
+          const resolved = backendItems
+            .filter((item) => item.product)
+            .map((item) => {
+              const p = item.product;
               return {
-                ...supabaseProduct,
-                href: `/product/${supabaseProduct.id}`,
-              };
-            }
+                id: Number(p.id),
+                slug: p.slug || String(p.id),
+                name: p.productName || p.name || 'Unknown Product',
+                category: p.category || 'Jewellery',
+                categorySlug: p.categorySlug || 'jewellery',
+                collectionSlug: p.collectionSlug || null,
+                price: Number(p.total_amount || p.base_price || p.basePrice || p.price || 0),
+                image: p.image_url || p.image || 'https://images.unsplash.com/photo-1599643478524-fb66f70362f6?w=800&q=80',
+                hoverImage: p.hover_image_url || null,
+                rating: Number(p.rating) || 5,
+                isNew: Boolean(p.is_new || p.isNew),
+                isBestSeller: Boolean(p.is_best_seller || p.isBestSeller),
+                engravable: Boolean(p.is_engravable || p.engravable),
+                metal: p.metaltype || p.metal || 'Gold',
+                createdAt: p.created_at || p.createdAt || new Date().toISOString(),
+                reviewsCount: 0,
+                href: `/product/${p.id}`,
+                basePrice: Number(p.base_price || p.basePrice || p.price || 0),
+                originalPrice: Number(p.original_price || p.originalPrice || p.price || 0),
+                gstPercentage: Number(p.gst_percentage || p.gstPercentage || 3),
+                stoneAmount: Number(p.stone_amount || p.stoneAmount || 0),
+                amountWithoutStones: Number(p.amount_without_stones || p.amountWithoutStones || 0),
+                netWeight: Number(p.net_weight || p.netWeight || 0),
+                grossWeight: Number(p.gross_weight || p.grossWeight || 0),
+                stoneWeight: Number(p.stone_weight || p.stoneWeight || 0),
+              } satisfies WishlistProduct;
+            });
+            
+          setWishlistProducts(resolved);
+        } else {
+          const payload = await fetchProductsByIds(wishlistIds);
+          if (!isMounted) return;
 
-            const localProduct = localById.get(id);
-            if (!localProduct) {
-              return null;
-            }
+          const resolved = payload.map((backendProduct) => ({
+            ...backendProduct,
+            href: `/product/${backendProduct.id}`,
+          }));
 
-            return {
-              id: localProduct.id,
-              slug: String(localProduct.id),
-              name: localProduct.name,
-              category: localProduct.category,
-              categorySlug: toCategorySlug(localProduct.category),
-              collectionSlug: null,
-              price: localProduct.price,
-              image: localProduct.image,
-              hoverImage: localProduct.hoverImage,
-              rating: Math.max(1, Math.min(5, Math.round(localProduct.rating))),
-              isNew: localProduct.isNew,
-              isBestSeller: localProduct.isBestSeller,
-              engravable: localProduct.engravable,
-              metal: localProduct.metal,
-              createdAt: localProduct.createdAt,
-              reviewsCount: 0,
-              href: `/category/${toCategorySlug(localProduct.category)}`,
-              basePrice: localProduct.price,
-              originalPrice: localProduct.price,
-              gstPercentage: 3.0,
-              stoneAmount: 0,
-              amountWithoutStones: localProduct.price,
-              netWeight: 0,
-              grossWeight: 0,
-              stoneWeight: 0,
-            } satisfies WishlistProduct;
-          })
-          .filter((item): item is WishlistProduct => Boolean(item));
-
-        setWishlistProducts(resolved);
+          setWishlistProducts(resolved);
+        }
       } catch {
         if (!isMounted) {
           return;
         }
 
         setWishlistProducts([]);
-        toast.error('Unable to load wishlist items from Supabase.');
+        toast.error('Unable to load wishlist items from backend.');
       } finally {
         if (isMounted) {
           setIsLoading(false);

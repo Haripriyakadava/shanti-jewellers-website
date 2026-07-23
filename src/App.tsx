@@ -6,7 +6,6 @@ import { toast } from "sonner";
 import {
   Menu,
   Phone,
-  Mail,
   MapPin,
   Heart,
   Search,
@@ -17,7 +16,10 @@ import {
   ArrowRight,
   Calendar,
   ChevronDown,
+  User,
 } from "lucide-react";
+import { useAuth } from "./auth/AuthContext";
+import { UserDropdown } from "./components/UserDropdown";
 import { SeoHead } from "./components/SeoHead";
 
 // Custom WhatsApp Icon
@@ -39,7 +41,6 @@ import { Button } from "@/components/ui/button";
 
 import { useCart } from "@/context/CartContext";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { collections as localLandingCollections } from "@/data/collections";
 import {
   getShopStorageEventName,
   getWishlistIds,
@@ -52,6 +53,7 @@ import {
   type ShopCollection,
   type ShopMetalPriceTickerItem,
 } from "@/lib/shop-api";
+import { Footer } from "@/components/Footer";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -230,16 +232,6 @@ export const googleReviews = [
   },
 ];
 
-const fallbackLandingCollections: ShopCollection[] =
-  localLandingCollections.map((collection, index) => ({
-    id: index + 1,
-    name: collection.name,
-    slug: collection.slug,
-    subtitle: collection.subtitle,
-    description: collection.description,
-    image: collection.image,
-  }));
-
 const jewelleryTypes = [
   {
     id: 1,
@@ -333,13 +325,15 @@ type HomeCategory = {
 function App() {
   const isMobile = useIsMobile();
   const { totalItems } = useCart();
+  const { isAuthenticated } = useAuth();
   const [isNavOpen, setIsNavOpen] = useState(false);
   const [selectedProduct] =
     useState<ShopProductCard | null>(null);
   const [isProductDialogOpen, setIsProductDialogOpen] = useState(false);
   const [isWhatsAppDialogOpen, setIsWhatsAppDialogOpen] = useState(false);
   const [isAppointmentDialogOpen, setIsAppointmentDialogOpen] = useState(false);
-  const [wishlist, setWishlist] = useState<number[]>(() => getWishlistIds());
+  const [localWishlist, setLocalWishlist] = useState<number[]>(() => getWishlistIds());
+  const [dbWishlistCount, setDbWishlistCount] = useState<number | null>(null);
 
   // Category State
   const [landingCategories, setLandingCategories] = useState<HomeCategory[]>([]);
@@ -359,7 +353,7 @@ function App() {
   );
   const [landingCollections, setLandingCollections] = useState<
     ShopCollection[]
-  >(fallbackLandingCollections);
+  >([]);
 
   const [goldPriceTicker, setGoldPriceTicker] = useState<
     ShopMetalPriceTickerItem[]
@@ -379,6 +373,8 @@ function App() {
     const prefersSaveData = Boolean(connection?.saveData);
     return !(prefersReducedMotion || prefersSaveData);
   });
+
+  const displayWishlistCount = dbWishlistCount !== null ? dbWishlistCount : localWishlist.length;
 
   const heroRef = useRef<HTMLDivElement>(null);
   const heroVideoRef = useRef<HTMLVideoElement>(null);
@@ -585,7 +581,42 @@ function App() {
   }, []);
 
   useEffect(() => {
-    const syncWishlist = () => setWishlist(getWishlistIds());
+    let timeoutId: ReturnType<typeof setTimeout>;
+
+    const syncWishlist = () => {
+      setLocalWishlist(getWishlistIds());
+      if (isAuthenticated) {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+          import("@/services/wishlist.service").then(({ wishlistService }) => {
+            wishlistService.getWishlist()
+              .then(items => {
+                setDbWishlistCount(items.length);
+                const backendIds = items.map(i => Number(i.productId)).filter(id => !isNaN(id));
+                const localIds = getWishlistIds();
+                
+                // Keep local storage perfectly synced with backend for authenticated users
+                // If they don't match, overwrite local storage with backend truth
+                if (backendIds.length !== localIds.length || backendIds.some(id => !localIds.includes(id))) {
+                  import('@/lib/shop-storage').then(({ setWishlistIds }) => {
+                    setWishlistIds(backendIds);
+                    setLocalWishlist(backendIds);
+                  });
+                }
+              })
+              .catch(() => setDbWishlistCount(null));
+          });
+        }, 500);
+      } else {
+        setDbWishlistCount(null);
+      }
+    };
+    
+    // Initial sync for authenticated users
+    if (isAuthenticated) {
+      syncWishlist();
+    }
+
     const shopStorageEvent = getShopStorageEventName();
 
     window.addEventListener(shopStorageEvent, syncWishlist);
@@ -595,7 +626,7 @@ function App() {
       window.removeEventListener(shopStorageEvent, syncWishlist);
       window.removeEventListener("storage", syncWishlist);
     };
-  }, []);
+  }, [isAuthenticated]);
 
   // Fetch Free Live Gold & Silver API (No Key Required)
   useEffect(() => {
@@ -684,17 +715,19 @@ function App() {
         return;
       }
 
-      if (collectionsResult.status === "fulfilled") {
+      if (collectionsResult.status === "fulfilled" && collectionsResult.value.length > 0) {
         setLandingCollections(collectionsResult.value);
       } else {
-        setLandingCollections(fallbackLandingCollections);
-        toast.error(
-          "Unable to load collections from Supabase. Showing local lookbook.",
-        );
+        setLandingCollections([]);
+        if (collectionsResult.status === "rejected") {
+          toast.error(
+            "Unable to load collections from backend.",
+          );
+        }
       }
 
-      // Load Categories from Supabase
-      if (categoriesResult.status === "fulfilled") {
+      // Load Categories from backend
+      if (categoriesResult.status === "fulfilled" && categoriesResult.value.length > 0) {
         setLandingCategories(
           categoriesResult.value.map((category) => ({
             id: category.id,
@@ -705,7 +738,9 @@ function App() {
         );
       } else {
         setLandingCategories([]);
-        toast.error("Unable to load categories from Supabase.");
+        if (categoriesResult.status === "rejected") {
+          toast.error("Unable to load categories from backend.");
+        }
       }
       setIsCategoriesLoading(false);
 
@@ -911,14 +946,14 @@ function App() {
                 <Search className="w-4 h-4 sm:w-5 sm:h-5" />
               </Link>
               <Link
-                to="/wishlist"
+                to="/account/wishlist"
                 className="p-1.5 sm:p-2 hover:text-gold transition-colors relative"
                 aria-label="Open wishlist"
               >
                 <Heart className="w-4 h-4 sm:w-5 sm:h-5" />
-                {wishlist.length > 0 && (
+                {displayWishlistCount > 0 && (
                   <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] sm:min-w-5 sm:h-5 px-1 bg-gold text-charcoal text-[9px] sm:text-[10px] rounded-full flex items-center justify-center font-semibold">
-                    {wishlist.length}
+                    {displayWishlistCount}
                   </span>
                 )}
               </Link>
@@ -934,6 +969,15 @@ function App() {
                   </span>
                 )}
               </Link>
+
+              {isAuthenticated ? (
+                <UserDropdown />
+              ) : (
+                <Link to="/login" className="p-1.5 sm:p-2 hover:text-gold transition-colors flex items-center gap-1">
+                  <User className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <span className="hidden sm:inline-block text-sm font-medium">Login</span>
+                </Link>
+              )}
 
               {/* Mobile Menu */}
               <Sheet open={isNavOpen} onOpenChange={setIsNavOpen}>
@@ -994,10 +1038,20 @@ function App() {
                     <Link
                       to="/cart"
                       onClick={() => setIsNavOpen(false)}
-                      className="text-lg hover:text-gold transition-colors"
+                      className="text-lg hover:text-gold transition-colors flex items-center gap-2"
                     >
-                      Cart ({totalItems})
+                      <ShoppingBag className="w-5 h-5" /> Cart ({totalItems})
                     </Link>
+
+                    {isAuthenticated ? (
+                      <Link to="/account" onClick={() => setIsNavOpen(false)} className="text-lg hover:text-gold transition-colors flex items-center gap-2">
+                        <User className="w-5 h-5" /> Account
+                      </Link>
+                    ) : (
+                      <Link to="/login" onClick={() => setIsNavOpen(false)} className="text-lg hover:text-gold transition-colors flex items-center gap-2">
+                        <User className="w-5 h-5" /> Login
+                      </Link>
+                    )}
                     <hr className="border-white/10" />
                     <Button
                       onClick={() => {
@@ -2110,215 +2164,7 @@ function App() {
       </section>
 
       {/* Footer */}
-      <footer className="py-12 md:py-16 section-padding bg-charcoal-dark border-t border-white/5">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 md:gap-12 mb-10 md:mb-12">
-          <div>
-            <div className="flex items-center gap-2 md:gap-3 mb-4">
-              <img
-                src="/shantilogo.png"
-                alt="Shanti JEWELLERY Logo Nellore"
-                loading="lazy"
-                className="w-10 h-10 md:w-12 md:h-12 lg:w-[60px] lg:h-14 object-contain"
-              />
-              <span className="font-serif text-lg md:text-xl tracking-wider uppercase">
-                SHANTI <span className="text-gold">JEWELLERY</span>
-              </span>
-            </div>
-            <p className="text-gray-400 text-xs md:text-sm mb-6 leading-relaxed">
-              Crafting timeless elegance since 1960. Your trusted destination
-              for exquisite gold and diamond jewelry in Nellore.
-            </p>
-            <div className="flex flex-wrap gap-3 md:gap-4">
-              {/* Facebook */}
-              <a
-                href="https://www.facebook.com/shantijewellery01/"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Facebook"
-                className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center hover:border-gold transition-colors"
-              >
-                <img
-                  src="/fblogo.png"
-                  alt="Facebook"
-                  className="w-5 h-5 md:w-6 md:h-6 object-contain"
-                  loading="lazy"
-                  decoding="async"
-                />
-              </a>
-
-              {/* Instagram */}
-              <a
-                href="https://www.instagram.com/shanti_jewellery1960/?hl=en"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Instagram"
-                className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center hover:border-gold transition-colors"
-              >
-                <img
-                  src="/intalogo.png"
-                  alt="Instagram"
-                  className="w-5 h-5 md:w-6 md:h-6 object-contain"
-                  loading="lazy"
-                  decoding="async"
-                />
-              </a>
-
-              {/* YouTube */}
-              <a
-                href="https://youtu.be/M3qSUH2_soo?si=62Pz0jD-wNiXmZiX"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="YouTube"
-                className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center hover:border-gold transition-colors"
-              >
-                <img
-                  src="/youtubeicon.png"
-                  alt="YouTube"
-                  className="w-16 h-16 md:w-20 md:h-20 object-contain"
-                  loading="lazy"
-                  decoding="async"
-                />
-              </a>
-
-              {/* WhatsApp */}
-              <button
-                type="button"
-                onClick={() => {
-                  void openWhatsAppInquiry(
-                    "Hi, I am interested in your jewelry collection.",
-                  );
-                }}
-                aria-label="WhatsApp"
-                className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center hover:text-gold transition-colors"
-              >
-                <WhatsAppIcon className="w-4 h-4 md:w-5 md:h-5" />
-              </button>
-            </div>
-          </div>
-
-          <div>
-            <h4 className="font-serif text-base md:text-lg text-white mb-4 md:mb-6">
-              Quick Links
-            </h4>
-            <ul className="space-y-2 md:space-y-3">
-              <li>
-                <a
-                  href="#collections"
-                  className="text-gray-400 hover:text-gold transition-colors text-xs md:text-sm"
-                >
-                  Collections
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#featured"
-                  className="text-gray-400 hover:text-gold transition-colors text-xs md:text-sm"
-                >
-                  Featured
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#products"
-                  className="text-gray-400 hover:text-gold transition-colors text-xs md:text-sm"
-                >
-                  Shop
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="font-serif text-base md:text-lg text-white mb-4 md:mb-6">
-              Customer Service
-            </h4>
-            <ul className="space-y-2 md:space-y-3">
-              <li>
-                <a
-                  href="#"
-                  className="text-gray-400 hover:text-gold transition-colors text-xs md:text-sm"
-                >
-                  Contact Us
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="text-gray-400 hover:text-gold transition-colors text-xs md:text-sm"
-                >
-                  Shipping Info
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="text-gray-400 hover:text-gold transition-colors text-xs md:text-sm"
-                >
-                  Returns & Exchanges
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="text-gray-400 hover:text-gold transition-colors text-xs md:text-sm"
-                >
-                  Size Guide
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="font-serif text-base md:text-lg text-white mb-4 md:mb-6">
-              Contact
-            </h4>
-            <ul className="space-y-3 md:space-y-4">
-              <li className="flex items-start gap-2 md:gap-3">
-                <MapPin className="w-4 h-4 md:w-5 md:h-5 text-gold flex-shrink-0 mt-0.5" />
-                <span className="text-gray-400 text-xs md:text-sm leading-relaxed">
-                  2-148, Barkas Center, 17, Achari St, beside SBI, VRC Centre,
-                  Nellore, Andhra Pradesh 524001
-                </span>
-              </li>
-              <li className="flex items-center gap-2 md:gap-3">
-                <Phone className="w-4 h-4 md:w-5 md:h-5 text-gold flex-shrink-0" />
-                <span className="text-gray-400 text-xs md:text-sm">
-                  +91 90390 39056
-                </span>
-              </li>
-              <li className="flex items-center gap-2 md:gap-3">
-                <Mail className="w-4 h-4 md:w-5 md:h-5 text-gold flex-shrink-0" />
-                <span className="text-gray-400 text-xs md:text-sm break-all">
-                  info@shantijewellery.com
-                </span>
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        <div className="pt-6 md:pt-8 border-t  border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
-          <div className="items-center">
-            <p className="text-gray-500 text-xs md:text-sm">
-              © 2026 SHANTI JEWELLERY. All rights reserved.
-            </p>
-          </div>
-
-          <div className="flex flex-wrap justify-center gap-4 md:gap-6">
-            <a
-              href="#"
-              className="text-gray-500 hover:text-gold transition-colors text-xs md:text-sm"
-            >
-              Privacy Policy
-            </a>
-            <a
-              href="#"
-              className="text-gray-500 hover:text-gold transition-colors text-xs md:text-sm"
-            >
-              Terms of Service
-            </a>
-          </div>
-        </div>
-      </footer>
+      <Footer />
 
       {/* Product Dialog */}
       <Dialog open={isProductDialogOpen} onOpenChange={setIsProductDialogOpen}>

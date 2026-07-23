@@ -39,7 +39,7 @@ function CollectionsPage() {
         }
 
         setCollections(fallbackCollections);
-        toast.error('Unable to load collections from Supabase. Showing local lookbook.');
+        toast.error('Unable to load collections from backend. Showing local lookbook.');
       } finally {
         if (isMounted) {
           setIsLoading(false);

@@ -176,7 +176,7 @@ CREATE TABLE IF NOT EXISTS orders (
   order_number VARCHAR(50) NOT NULL UNIQUE,
   user_id UUID REFERENCES users(id) ON DELETE SET NULL,
   guest_email VARCHAR(255),
-  order_status VARCHAR(50) NOT NULL CHECK (order_status IN ('pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled', 'refunded')),
+  order_status VARCHAR(50) NOT NULL CHECK (order_status IN ('pending_payment', 'payment_confirmed', 'order_confirmed', 'jewellery_preparing', 'quality_check', 'packed', 'shipped', 'out_for_delivery', 'delivered', 'cancelled', 'returned', 'refund_initiated', 'refund_completed', 'pending', 'confirmed', 'processing', 'refunded')),
   payment_status VARCHAR(50) NOT NULL CHECK (payment_status IN ('pending', 'completed', 'failed', 'refunded')),
   payment_method VARCHAR(50),
   transaction_id VARCHAR(255),
@@ -197,10 +197,24 @@ CREATE TABLE IF NOT EXISTS orders (
   billing_postal_code VARCHAR(20),
   billing_country VARCHAR(100),
   notes TEXT,
+  courier_name VARCHAR(255),
   tracking_number VARCHAR(100),
+  shipment_id VARCHAR(100),
   estimated_delivery_date DATE,
+  delivered_at TIMESTAMP WITH TIME ZONE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Order Tracking History
+CREATE TABLE IF NOT EXISTS order_tracking_history (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  order_id INT NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+  status VARCHAR(50) NOT NULL,
+  description TEXT,
+  location VARCHAR(255),
+  updated_by UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Order Items

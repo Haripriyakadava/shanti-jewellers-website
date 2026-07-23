@@ -1,4 +1,5 @@
 import { getCurrentTenant, getTenantStorageNamespace } from '@/lib/tenant';
+import { toast } from 'sonner';
 
 const ROUND_ROBIN_KEY_PREFIX = 'tenant_whatsapp_rr:';
 const DEFAULT_COUNTRY_CODE = '91';
@@ -108,4 +109,22 @@ export async function buildTenantWhatsappHref(message: string): Promise<string |
   }
 
   return buildWhatsappHref(phoneNumber, message);
+}
+
+export async function openWhatsAppInquiry(message: string): Promise<void> {
+  try {
+    const inquiryHref = await buildTenantWhatsappHref(message);
+
+    if (!inquiryHref) {
+      toast.error('No WhatsApp number is configured for this tenant.');
+      return;
+    }
+
+    const openedWindow = window.open(inquiryHref, '_blank', 'noopener,noreferrer');
+    if (!openedWindow) {
+      window.location.href = inquiryHref;
+    }
+  } catch {
+    toast.error('Unable to open WhatsApp inquiry right now.');
+  }
 }

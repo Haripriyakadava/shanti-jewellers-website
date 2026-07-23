@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ArrowLeft, Search, ShoppingBag, X } from 'lucide-react';
+import { ArrowLeft, Search, X, User } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 
-import { useCart } from '@/context/CartContext';
+import { useAuth } from '@/auth/AuthContext';
+import { UserDropdown } from '@/components/UserDropdown';
 import { searchProducts, type ShopProductCard } from '@/lib/shop-api';
 
 function SearchSkeletonCard() {
@@ -28,8 +29,8 @@ function formatPrice(price: number) {
 }
 
 function SearchPage() {
-	const { totalItems } = useCart();
 	const [searchParams, setSearchParams] = useSearchParams();
+	const { isAuthenticated } = useAuth();
 	const [query, setQuery] = useState(() => searchParams.get('q') ?? '');
 	const [results, setResults] = useState<ShopProductCard[]>([]);
 	const [isLoading, setIsLoading] = useState(false);
@@ -105,14 +106,14 @@ function SearchPage() {
 							<ArrowLeft className="w-4 h-4" />
 							Back to Home
 						</Link>
-						<Link to="/cart" className="relative p-2 text-gray-300 hover:text-gold transition-colors" aria-label="Open cart">
-							<ShoppingBag className="w-5 h-5" />
-							{totalItems > 0 && (
-								<span className="absolute -top-1 -right-1 min-w-5 h-5 px-1 bg-gold text-charcoal text-[10px] rounded-full flex items-center justify-center font-semibold">
-									{totalItems}
-								</span>
-							)}
-						</Link>
+						{isAuthenticated ? (
+							<UserDropdown />
+						) : (
+							<Link to="/login" className="relative p-2 text-gray-300 hover:text-gold transition-colors flex items-center gap-1" aria-label="Login">
+								<User className="w-5 h-5" />
+								<span className="hidden sm:inline-block text-sm font-medium">Login</span>
+							</Link>
+						)}
 					</div>
 
 					<div className="mt-4">

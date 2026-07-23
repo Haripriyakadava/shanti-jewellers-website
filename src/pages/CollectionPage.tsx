@@ -104,7 +104,7 @@ function CollectionPage() {
 
         setCollection(null);
         setCollectionProducts([]);
-        toast.error('Unable to load collection products from Supabase.');
+        toast.error('Unable to load collection products from backend.');
       } 
       finally {
         if (isMounted) {
@@ -179,7 +179,7 @@ function CollectionPage() {
       <div className="min-h-screen bg-charcoal text-white section-padding py-20">
         <div className="max-w-3xl mx-auto border border-white/10 bg-charcoal-light p-10 text-center">
           <h1 className="font-serif text-3xl text-white mb-3">Collection Not Found</h1>
-          <p className="text-gray-300 mb-5">This collection is unavailable or missing in Supabase.</p>
+          <p className="text-gray-300 mb-5">This collection is unavailable or missing in backend.</p>
           <Link to="/" className="inline-flex items-center gap-2 text-gold hover:text-gold-light transition-colors">
             <ArrowLeft className="w-4 h-4" />
             Back to Home
@@ -217,7 +217,7 @@ function CollectionPage() {
     }
   };
 
-  const addCollectionProductToCart = (product: {
+  const addCollectionProductToCart = async (product: {
     id: number;
     name: string;
     price: string;
@@ -225,22 +225,26 @@ function CollectionPage() {
     badges: string[];
   }) => {
     const numericPrice = Number(product.price.replace(/[^0-9.]/g, ''));
-    addToCart({
-      productId: product.id,
-      name: product.name,
-      image: product.image,
-      unitPrice: Number.isFinite(numericPrice) ? numericPrice : 0,
-      quantity: 1,
-      selection: {
-        metal: detectMetal(product.name),
-        carat: 3,
-        diamondType: product.badges.includes('Lab Grown') ? 'Lab Grown' : 'Natural',
-        size: 'N/A',
-      },
-    });
-    toast.success(`${product.name} added to cart.`);
-    setCartMessage(`${product.name} added to cart.`);
-    window.setTimeout(() => setCartMessage(''), 2000);
+    try {
+      await addToCart({
+        productId: product.id,
+        name: product.name,
+        image: product.image,
+        unitPrice: Number.isFinite(numericPrice) ? numericPrice : 0,
+        quantity: 1,
+        selection: {
+          metal: detectMetal(product.name),
+          carat: 3,
+          diamondType: product.badges.includes('Lab Grown') ? 'Lab Grown' : 'Natural',
+          size: 'N/A',
+        },
+      });
+      toast.success(`${product.name} added to cart.`);
+      setCartMessage(`${product.name} added to cart.`);
+      window.setTimeout(() => setCartMessage(''), 2000);
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to add item to cart. Please check your connection.');
+    }
   };
 
   return (

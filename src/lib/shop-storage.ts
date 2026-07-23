@@ -1,4 +1,6 @@
 import { getTenantStorageNamespace } from '@/lib/tenant';
+import { getItem, StorageKeys } from '@/auth/storage';
+import { wishlistService } from '@/services/wishlist.service';
 
 export type CartItem = {
   id: number;
@@ -63,17 +65,34 @@ export function getWishlistIds() {
   return readJSON<number[]>(scopedStorageKey(WISHLIST_KEY), []);
 }
 
+export function setWishlistIds(ids: number[]) {
+  writeJSON(scopedStorageKey(WISHLIST_KEY), ids);
+  emitUpdate();
+}
+
 export function isInWishlist(id: number) {
   return getWishlistIds().includes(id);
 }
 
+function syncWishlistWithBackend(id: number, isAdding: boolean) {
+  if (typeof window !== 'undefined' && getItem(StorageKeys.ACCESS_TOKEN)) {
+    if (isAdding) {
+      wishlistService.addProduct(id).catch(() => {});
+    } else {
+      wishlistService.removeProduct(id).catch(() => {});
+    }
+  }
+}
+
 export function toggleWishlistItem(id: number) {
   const wishlist = getWishlistIds();
-  const updated = wishlist.includes(id)
-    ? wishlist.filter((itemId) => itemId !== id)
-    : [...wishlist, id];
+  const isAdding = !wishlist.includes(id);
+  const updated = isAdding
+    ? [...wishlist, id]
+    : wishlist.filter((itemId) => itemId !== id);
 
   writeJSON(scopedStorageKey(WISHLIST_KEY), updated);
+  syncWishlistWithBackend(id, isAdding);
   return updated;
 }
 
@@ -81,6 +100,7 @@ export function removeWishlistItem(id: number) {
   const wishlist = getWishlistIds();
   const updated = wishlist.filter((itemId) => itemId !== id);
   writeJSON(scopedStorageKey(WISHLIST_KEY), updated);
+  syncWishlistWithBackend(id, false);
   return updated;
 }
 

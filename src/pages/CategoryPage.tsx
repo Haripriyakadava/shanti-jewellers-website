@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Heart, ShoppingBag, SlidersHorizontal } from 'lucide-react';
+import { ArrowLeft, Heart, SlidersHorizontal, User } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { useCart } from '@/context/CartContext';
+import { UserDropdown } from '@/components/UserDropdown';
+import { useAuth } from '@/auth/AuthContext';
+
 import { getShopStorageEventName, getWishlistIds, toggleWishlistItem } from '@/lib/shop-storage';
 import {
   fetchAllCategories,
@@ -33,7 +35,7 @@ function CategoryPage() {
   const { categoryName = '' } = useParams();
   const normalizedCategorySlug = decodeURIComponent(categoryName).trim().toLowerCase();
   const navigate = useNavigate();
-  const { totalItems } = useCart();
+  const { isAuthenticated } = useAuth();
   const [activeCategory, setActiveCategory] = useState<ShopCategory | null>(null);
   const [allCategories, setAllCategories] = useState<ShopCategory[]>([]);
   const [products, setProducts] = useState<ShopProductCard[]>([]);
@@ -96,7 +98,7 @@ function CategoryPage() {
         setProducts([]);
         setAllCategories([]);
         setMaxPriceFilter(0);
-        toast.error('Unable to load category data from Supabase.');
+        toast.error('Unable to load category data from backend.');
       } finally {
         if (isMounted) {
           setIsLoading(false);
@@ -153,16 +155,7 @@ function CategoryPage() {
     }).format(price);
   };
 
-  const toggleWishlist = (id: number) => {
-    const isAdding = !wishlist.includes(id);
-    const nextWishlist = toggleWishlistItem(id);
-    setWishlist(nextWishlist);
-
-    if (isAdding) {
-      const productName = products.find((item) => item.id === id)?.name ?? 'Product';
-      toast.success(`${productName} added to wishlist.`);
-    }
-  };
+  const toggleWishlist = async (id: number) => { const nextWishlist = await toggleWishlistItem(id); setWishlist(nextWishlist); };
 
   const toggleMetal = (metal: string) => {
     setSelectedMetals((previous) =>
@@ -225,14 +218,14 @@ function CategoryPage() {
             </div>
             <div className="flex items-center gap-4 md:pb-0.5">
                 <div className="text-xs md:text-sm text-gray-400">{isLoading ? 0 : filteredProducts.length} Products Available</div>
-              <Link to="/cart" className="relative p-2 text-gray-300 hover:text-gold transition-colors" aria-label="Open cart">
-                <ShoppingBag className="w-5 h-5" />
-                {totalItems > 0 && (
-                  <span className="absolute -top-1 -right-1 min-w-5 h-5 px-1 bg-gold text-charcoal text-[10px] rounded-full flex items-center justify-center font-semibold">
-                    {totalItems}
-                  </span>
-                )}
-              </Link>
+              {isAuthenticated ? (
+                <UserDropdown />
+              ) : (
+                <Link to="/login" className="relative p-2 text-gray-300 hover:text-gold transition-colors flex items-center gap-1" aria-label="Login">
+                  <User className="w-5 h-5" />
+                  <span className="hidden md:inline-block text-sm font-medium">Login</span>
+                </Link>
+              )}
             </div>
           </div>
         </div>

@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Heart, Loader2, Share2, ShoppingBag } from 'lucide-react';
+import { ArrowLeft, Heart, Loader2, Share2, User } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/context/CartContext';
+import { UserDropdown } from '@/components/UserDropdown';
+import { useAuth } from '@/auth/AuthContext';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { applyShareMeta } from '@/lib/share-meta';
 import { getShopStorageEventName, getWishlistIds, toggleWishlistItem } from '@/lib/shop-storage';
@@ -15,7 +17,8 @@ function ProductPage() {
   const { productId = '' } = useParams();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const { addToCart, totalItems, cartItems } = useCart();
+  const { isAuthenticated } = useAuth();
+  const { addToCart, cartItems } = useCart();
   const resolvedProductId = Number(productId);
 
   const [product, setProduct] = useState<ShopProductDetail | null>(null);
@@ -72,7 +75,7 @@ function ProductPage() {
 
         setProduct(null);
         setLoadedProductId(resolvedProductId);
-        toast.error('Unable to load product details from Supabase.');
+        toast.error('Unable to load product details from backend.');
       }
     };
 
@@ -315,24 +318,27 @@ function ProductPage() {
 
     setIsAddingToCart(true);
 
-    await new Promise((resolve) => window.setTimeout(resolve, 320));
+    try {
+      await addToCart({
+        productId: product.id,
+        name: product.name,
+        image: product.image,
+        unitPrice: price,
+        quantity: 1,
+        selection: {
+          metal: selectedMetal || 'N/A',
+          carat: selectedCarat || 0,
+          diamondType: selectedDiamondType || 'N/A',
+          size: 'N/A',
+        },
+      });
 
-    addToCart({
-      productId: product.id,
-      name: product.name,
-      image: product.image,
-      unitPrice: price,
-      quantity: 1,
-      selection: {
-        metal: selectedMetal || 'N/A',
-        carat: selectedCarat || 0,
-        diamondType: selectedDiamondType || 'N/A',
-        size: 'N/A',
-      },
-    });
-
-    setIsAddingToCart(false);
-    toast.success('Added to Cart');
+      toast.success('Added to Cart');
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to add item to cart. Please check your connection.');
+    } finally {
+      setIsAddingToCart(false);
+    }
   };
 
   if (!isLoading && !product) {
@@ -370,14 +376,14 @@ function ProductPage() {
               <Share2 className="w-4 h-4" />
               Share
             </button>
-            <Link to="/cart" className="relative p-2 text-gray-300 hover:text-gold transition-colors" aria-label="Open cart">
-              <ShoppingBag className="w-5 h-5" />
-              {totalItems > 0 && (
-                <span className="absolute -top-1 -right-1 min-w-5 h-5 px-1 bg-gold text-charcoal text-[10px] rounded-full flex items-center justify-center font-semibold">
-                  {totalItems}
-                </span>
-              )}
-            </Link>
+            {isAuthenticated ? (
+              <UserDropdown />
+            ) : (
+              <Link to="/login" className="relative p-2 text-gray-300 hover:text-gold transition-colors flex items-center gap-1" aria-label="Login">
+                <User className="w-5 h-5" />
+                <span className="hidden sm:inline-block text-sm font-medium">Login</span>
+              </Link>
+            )}
           </div>
         </div>
       </section>

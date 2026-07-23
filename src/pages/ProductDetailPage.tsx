@@ -72,7 +72,7 @@ function ProductDetailPage() {
         setCollection(null);
         setProduct(null);
         setSimilarProducts([]);
-        toast.error('Unable to load product details from Supabase.');
+        toast.error('Unable to load product details from backend.');
       } finally {
         if (isMounted) {
           setIsLoading(false);
@@ -188,7 +188,7 @@ function ProductDetailPage() {
       <div className="min-h-screen bg-charcoal text-white section-padding py-20">
         <div className="max-w-3xl mx-auto border border-white/10 bg-charcoal-light p-10 text-center">
           <h1 className="font-serif text-3xl text-white mb-3">Product Not Found</h1>
-          <p className="text-gray-300 mb-5">This product is unavailable in Supabase.</p>
+          <p className="text-gray-300 mb-5">This product is unavailable in backend.</p>
           <Link to="/" className="inline-flex items-center gap-2 text-gold hover:text-gold-light transition-colors">
             <ArrowLeft className="w-4 h-4" />
             Back to Home
@@ -213,28 +213,32 @@ function ProductDetailPage() {
     );
   }
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     if (isProductInCart) {
       navigate('/cart');
       return;
     }
 
-    addToCart({
-      productId: product.id,
-      name: product.name,
-      image: product.image,
-      unitPrice: calculatedPrice,
-      quantity: 1,
-      selection: {
-        metal: selectedMetal,
-        size: 'N/A',
-        carat: Number(selectedCaratWeight),
-        diamondType: selectedDiamondType,
-      },
-    });
+    try {
+      await addToCart({
+        productId: product.id,
+        name: product.name,
+        image: product.image,
+        unitPrice: calculatedPrice,
+        quantity: 1,
+        selection: {
+          metal: selectedMetal,
+          size: 'N/A',
+          carat: Number(selectedCaratWeight),
+          diamondType: selectedDiamondType,
+        },
+      });
 
-    setCartMessage(`Added to cart: ${selectedMetal || 'N/A'}.`);
-    toast.success(`${product.name} added to cart.`);
+      setCartMessage(`Added to cart: ${selectedMetal || 'N/A'}.`);
+      toast.success(`${product.name} added to cart.`);
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to add item to cart. Please check your connection.');
+    }
   };
 
   const handleToggleWishlist = (itemId: number) => {
